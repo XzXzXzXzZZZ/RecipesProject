@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using Microsoft.EntityFrameworkCore;
+using RecipesProject.Models;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -18,6 +20,10 @@ namespace RecipesProject
     {
         public MainWindow()
         {
+            using (DBContext dbContext = new DBContext())
+            {
+                dbContext.Database.Migrate();
+            }
             InitializeComponent();
         }
     }

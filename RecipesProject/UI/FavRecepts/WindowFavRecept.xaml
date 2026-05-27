@@ -1,0 +1,41 @@
+﻿<Window x:Class="RecipesProject.UI.FavRecepts.WindowFavRecept"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RecipesProject.UI.FavRecepts"
+        mc:Ignorable="d"
+        Title="WindowFavRecept" Height="450" Width="800">
+    <Grid>
+        <Button 
+            x:Name="NewReceptBTN"
+            Content="+" 
+            HorizontalAlignment="Center" 
+            Height="50" 
+            Margin="0,375,0,0" 
+            VerticalAlignment="Top" 
+            Width="50" 
+            FontSize="32" 
+            RenderTransformOrigin="0.572,0.184"
+            Click="NewReceptBTN_Click"/>
+        <Button 
+            x:Name="MainMenuBTN"
+            Content="Меню" 
+            HorizontalAlignment="Left" 
+            Height="40"  
+            Margin="299,380,0,0" 
+            VerticalAlignment="Top" 
+            Width="40"
+            Click="MainMenuBTN_Click"/>
+        <Button 
+            x:Name="AllReceptBTN"
+            Content="ВсеРецепт" 
+            HorizontalAlignment="Left" 
+            Height="40"  
+            Margin="459,380,0,0" 
+            VerticalAlignment="Top" 
+            Width="40"
+            Click="AllReceptBTN_Click"/>
+
+    </Grid>
+</Window>

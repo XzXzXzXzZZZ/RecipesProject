@@ -7,7 +7,6 @@ namespace RecipesProject.UI.FavRecepts
     public partial class WindowFavRecept : Window
     {
         public WindowFavRecept()
-
         {
             InitializeComponent();
         }

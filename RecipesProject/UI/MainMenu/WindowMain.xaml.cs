@@ -9,6 +9,12 @@ namespace RecipesProject.UI.MainMenu
 {
     public partial class WindowMain : Window
     {
+        public WindowMain()
+        {
+            InitializeComponent();
+            MainContentControl.Content = new AllReceptsControl();
+            ShowMainMenuButtons();
+        }
 
         // Метод для отображения кнопок главного меню
         private void ShowMainMenuButtons()

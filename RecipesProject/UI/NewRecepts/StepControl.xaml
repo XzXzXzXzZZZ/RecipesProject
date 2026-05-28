@@ -10,6 +10,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <!-- Заголовок -->
@@ -70,7 +71,68 @@
                 </ScrollViewer>
             </StackPanel>
 
-            <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20">
+            <!-- Время приготовления -->
+            <StackPanel Grid.Row="3" Margin="0,0,0,15">
+                <TextBlock Text="Время приготовления:" FontSize="18" Margin="0,0,0,10"/>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                    <!-- Часы (опционально) -->
+                    <StackPanel Orientation="Horizontal" Margin="0,0,15,0">
+                        <TextBox x:Name="HoursTextBox" 
+                                 Width="60" 
+                                 Height="35" 
+                                 Padding="5" 
+                                 FontSize="14"
+                                 TextAlignment="Center"
+                                 MaxLength="3"
+                                 PreviewTextInput="HoursTextBox_PreviewTextInput"
+                                 TextChanged="HoursTextBox_TextChanged"
+                                 GotFocus="HoursTextBox_GotFocus"
+                                 LostFocus="HoursTextBox_LostFocus"/>
+                        <TextBlock Text="ч" 
+                                   FontSize="14" 
+                                   VerticalAlignment="Center" 
+                                   Margin="5,0,0,0"/>
+                        <TextBlock x:Name="HoursPlaceholderText"
+                                   Text="0"
+                                   FontSize="14"
+                                   Foreground="Gray"
+                                   VerticalAlignment="Center"
+                                   Margin="-55,0,0,0"
+                                   IsHitTestVisible="False"
+                                   Visibility="Collapsed"/>
+                    </StackPanel>
+
+                    <!-- Минуты (опционально) -->
+                    <StackPanel Orientation="Horizontal">
+                        <TextBox x:Name="MinutesTextBox" 
+                                 Width="60" 
+                                 Height="35" 
+                                 Padding="5" 
+                                 FontSize="14"
+                                 TextAlignment="Center"
+                                 MaxLength="2"
+                                 PreviewTextInput="MinutesTextBox_PreviewTextInput"
+                                 TextChanged="MinutesTextBox_TextChanged"
+                                 GotFocus="MinutesTextBox_GotFocus"
+                                 LostFocus="MinutesTextBox_LostFocus"/>
+                        <TextBlock Text="м" 
+                                   FontSize="14" 
+                                   VerticalAlignment="Center" 
+                                   Margin="5,0,0,0"/>
+                        <TextBlock x:Name="MinutesPlaceholderText"
+                                   Text="0"
+                                   FontSize="14"
+                                   Foreground="Gray"
+                                   VerticalAlignment="Center"
+                                   Margin="-55,0,0,0"
+                                   IsHitTestVisible="False"
+                                   Visibility="Collapsed"/>
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+
+            <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20">
                 <Button x:Name="BackButton"
                         Content="◀ Назад к ингредиентам" 
                         Height="40" 
@@ -92,7 +154,7 @@
                         Click="SaveRecipeButton_Click"/>
             </StackPanel>
 
-            <Rectangle Grid.Row="4" Height="20"/>
+            <Rectangle Grid.Row="5" Height="20"/>
         </Grid>
     </ScrollViewer>
 </UserControl>

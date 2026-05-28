@@ -51,7 +51,8 @@
                 HorizontalAlignment="Right"
                 Background="LightGray"
                 Padding="5" 
-                Margin="10"/>
+                Margin="10"
+                Click="FridgeBTN_Click"/>
             </Grid>
         </Border>
 

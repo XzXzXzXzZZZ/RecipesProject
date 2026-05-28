@@ -139,5 +139,36 @@ namespace RecipesProject.UI.MainMenu
         {
             PlaceholderText.Visibility = string.IsNullOrEmpty(SearchTextBox.Text) ? Visibility.Visible : Visibility.Collapsed;
         }
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ///           ХОЛОДИЛЬНИК
+        private void FridgeBTN_Click(object sender, RoutedEventArgs e)
+        {
+            MainContentControl.Content = new Fridge.FridgeControl();
+            SearchBorder.Visibility = Visibility.Collapsed;
+            ShowFridgeButtons();
+        }
+
+        //Кнопки в режиме холодильника
+        private void ShowFridgeButtons()
+        {
+            ButtonsPanel.Children.Clear();
+
+            var backToMenuBtn = CreateButton("🏠 Главный экран", "MainMenu", 140);
+            var clearSelectionBtn = CreateButton("🗑 Очистить выбор", "ClearSelection", 140);
+
+            backToMenuBtn.Click += MainMenuBTN_Click;
+            clearSelectionBtn.Click += ClearSelectionBTN_Click;
+
+            ButtonsPanel.Children.Add(backToMenuBtn);
+            ButtonsPanel.Children.Add(clearSelectionBtn);
+        }
+
+        private void ClearSelectionBTN_Click(object sender, RoutedEventArgs e)
+        {
+            if (MainContentControl.Content is Fridge.FridgeControl fridgeControl)
+            {
+                fridgeControl.ClearAllSelections();
+            }
+        }
     }
 }

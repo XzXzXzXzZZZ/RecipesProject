@@ -2,9 +2,14 @@
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Microsoft.EntityFrameworkCore;
+using RecipesProject.Models;
 using RecipesProject.UI.AllRecepts;   
 using RecipesProject.UI.FavRecepts;   
 using RecipesProject.UI.NewRecepts;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace RecipesProject.UI.MainMenu
 {
@@ -13,7 +18,9 @@ namespace RecipesProject.UI.MainMenu
         public WindowMain()
         {
             InitializeComponent();
-            MainContentControl.Content = new AllReceptsControl();
+
+            AddTestData.push();
+            LoadAllRecipes();
             ShowMainMenuButtons();
         }
 
@@ -122,13 +129,13 @@ namespace RecipesProject.UI.MainMenu
 
         private void AllReceptBTN_Click(object sender, RoutedEventArgs e)
         {
-            MainContentControl.Content = new AllReceptsControl();
+            LoadAllRecipes();
             ShowAllReceptsButtons();
         }
 
         private void MainMenuBTN_Click(object sender, RoutedEventArgs e)
         {
-            MainContentControl.Content = new AllReceptsControl();
+            LoadAllRecipes();
             ShowMainMenuButtons();
             SearchBorder.Visibility = Visibility.Visible;
             SearchTextBox.Text = "Поиск...";

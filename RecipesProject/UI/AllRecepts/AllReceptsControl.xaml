@@ -13,9 +13,9 @@
                            FontWeight="Bold" 
                            Margin="0,0,0,10"/>
                 <ListBox x:Name="ReceptsListBox" Height="Auto">
-                    <ListBoxItem Content="Рецепт 1: Борщ"/>
-                    <ListBoxItem Content="Рецепт 2: Пельмени"/>
-                    <ListBoxItem Content="Рецепт 3: Оливье"/>
+                    <ListBoxItem Tag="1" Content="Рецепт 1: Борщ" MouseDoubleClick="ListBoxItem_MouseDoubleClick"/>
+                    <ListBoxItem Tag="2" Content="Рецепт 2: Пельмени" MouseDoubleClick="ListBoxItem_MouseDoubleClick"/>
+                    <ListBoxItem Tag="3" Content="Рецепт 3: Оливье" MouseDoubleClick="ListBoxItem_MouseDoubleClick"/>
                 </ListBox>
             </StackPanel>
         </ScrollViewer>

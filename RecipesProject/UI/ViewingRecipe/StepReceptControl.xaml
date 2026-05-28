@@ -1,0 +1,22 @@
+﻿<UserControl x:Class="RecipesProject.UI.ViewingRecipe.StepReceptControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <Label x:Name="NumberStep"  Content="Шаг: " Grid.Row="0"/>
+
+        <!--<Border BorderBrush="Black" BorderThickness="1" Grid.Row="1">
+            <Grid Height="100">
+                <Label Content="Photo" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Grid>
+        </Border>-->
+
+        <TextBlock x:Name="DescriptionStep" Text="Описание" Grid.Row="2"/>
+
+    </Grid>
+</UserControl>

@@ -1,0 +1,35 @@
+﻿<UserControl x:Class="RecipesProject.UI.ViewingRecipe.RecipeViewControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer Background="White">
+        <Grid x:Name="gridView">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <!--<Border BorderBrush="Black" BorderThickness="1" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3">
+                <Grid Height="100">
+                    <Label Content="Photo" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Grid>
+            </Border>-->
+            <Button x:Name="IsFavoriteBtn" Grid.Row="0" Grid.Column="2" Content="В избранное" Click="IsFavoriteBtn_Click"/>
+            <Label x:Name="NameRecipe" Content="Название рецепта" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Center"/>
+            <Label x:Name="DifficultyRecipe" Content="Сложность: " Grid.Row="3" Grid.Column="0"/>
+            <Label x:Name="CookingTimeRecipe" Content="Время приготовления: " Grid.Row="3" Grid.Column="1"/>
+            <Label x:Name="ServingsRecipe" Content="Количество порций: " Grid.Row="3" Grid.Column="2"/>
+            <TextBlock x:Name="DescriptionRecipe" TextWrapping="Wrap" Text="Описание рецепта" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3"/>
+            <TextBlock x:Name="IngredientRecipe" TextWrapping="Wrap" Text="Ингридиенты:" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3"/>
+
+        </Grid>
+    </ScrollViewer>
+</UserControl>

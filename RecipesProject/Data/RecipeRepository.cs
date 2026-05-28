@@ -71,6 +71,17 @@ namespace RecipesProject.Data
             }
         }
 
+        public void UpdateIsFavorite(int id, int isFavorite)
+        {
+            var recipe = _context.Recipes.FirstOrDefault(r => r.Id == id);
+            if (recipe != null)
+            {
+                recipe.IsFavorite = isFavorite;
+                recipe.UpdatedAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                _context.SaveChanges();
+            }
+        }
+
         public void Delete(int id)
         {
             var recipe = _context.Recipes.Find(id);

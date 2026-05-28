@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace RecipesProject.UI.NewRecepts
 {
@@ -17,14 +18,52 @@ namespace RecipesProject.UI.NewRecepts
             this.ingredients = ingredients;
             RecipeNameText.Text = recipeName;
             StepsListBox.ItemsSource = steps;
+
+            // Начальное состояние
+            StepTextBox.Text = "";
+            UpdatePlaceholderVisibility();
+        }
+
+        public StepControl()
+        {
+            InitializeComponent();
+            StepTextBox.Text = "";
+            UpdatePlaceholderVisibility();
+        }
+
+        private void UpdatePlaceholderVisibility()
+        {
+            if (PlaceholderText != null)
+            {
+                PlaceholderText.Visibility = string.IsNullOrEmpty(StepTextBox.Text) ? Visibility.Visible : Visibility.Collapsed;
+            }
+        }
+
+        private void StepTextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (PlaceholderText != null)
+            {
+                PlaceholderText.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private void StepTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            UpdatePlaceholderVisibility();
+        }
+
+        private void StepTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            UpdatePlaceholderVisibility();
         }
 
         private void AddStepButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!string.IsNullOrWhiteSpace(StepTextBox.Text) && StepTextBox.Text != "Введите шаг...")
+            if (!string.IsNullOrWhiteSpace(StepTextBox.Text))
             {
                 steps.Add($"Шаг {steps.Count + 1}: {StepTextBox.Text}");
                 StepTextBox.Clear();
+                UpdatePlaceholderVisibility();
                 StepTextBox.Focus();
             }
             else
@@ -54,7 +93,6 @@ namespace RecipesProject.UI.NewRecepts
 
             string allSteps = string.Join("\n", steps);
 
-            //ТУТ ЛОГИКА СОХРАНЕНИЯ В БД!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             MessageBox.Show($"Рецепт \"{recipeName}\" успешно сохранен!\n\nИнгредиенты:\n{ingredients}\n\nШаги:\n{allSteps}",
                 "Успех!", MessageBoxButton.OK, MessageBoxImage.Information);
         }

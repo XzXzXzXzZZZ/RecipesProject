@@ -46,8 +46,6 @@
                              Height="30"
                              Padding="5" 
                              FontSize="12"
-                             Text="Какой ингредиент вы ищете?"
-                             Foreground="Gray"
                              VerticalAlignment="Center"
                              GotFocus="SearchIngredientTextBox_GotFocus"
                              LostFocus="SearchIngredientTextBox_LostFocus"/>

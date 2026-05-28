@@ -2,7 +2,6 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <!-- Добавляем ScrollViewer для всего содержимого -->
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
         <Grid Background="White" Margin="20">
             <Grid.RowDefinitions>
@@ -23,7 +22,7 @@
 
             <!-- Информация о рецепте -->
             <StackPanel Grid.Row="1" Margin="0,0,0,15">
-                <TextBlock Text="Рецепт:" FontSize="14" Margin="0,0,0,5"/>
+                <TextBlock Text="Рецепт:" FontSize="18" Margin="0,0,0,5"/>
                 <TextBlock x:Name="RecipeNameText" 
                            Text="[Название рецепта]" 
                            FontSize="16" 
@@ -33,29 +32,42 @@
             </StackPanel>
 
             <StackPanel Grid.Row="2" Margin="0,0,0,15">
-                <TextBlock Text="Шаги приготовления:" FontSize="14" Margin="0,0,0,5"/>
-                
-                <ScrollViewer Height="200" VerticalScrollBarVisibility="Auto" Margin="0,0,0,10">
-                    <ListBox x:Name="StepsListBox" 
-                             ScrollViewer.VerticalScrollBarVisibility="Auto"/>
-                </ScrollViewer>
+                <TextBlock Text="Шаги приготовления:" FontSize="18" Margin="0,0,0,5"/>
 
-                <StackPanel Orientation="Horizontal" Margin="0,5">
+                <!-- Поле для ввода шага с подсказкой внутри -->
+                <Grid Margin="0,0,0,10" Width="400" HorizontalAlignment="Left">
                     <TextBox x:Name="StepTextBox" 
-                             Width="300" 
                              Height="35" 
                              Padding="5" 
                              FontSize="14"
-                             Text="Введите шаг..."/>
-                    <Button x:Name="AddStepButton"
-                            Content="➕ Добавить шаг" 
-                            Height="35" 
-                            Width="120"
-                            Margin="10,0,0,0"
-                            Background="LightGreen"
-                            Cursor="Hand"
-                            Click="AddStepButton_Click"/>
-                </StackPanel>
+                             GotFocus="StepTextBox_GotFocus"
+                             LostFocus="StepTextBox_LostFocus"
+                             TextChanged="StepTextBox_TextChanged"/>
+                    <TextBlock x:Name="PlaceholderText"
+                               Text="Введите шаг приготовления..."
+                               Height="35"
+                               Padding="5"
+                               FontSize="14"
+                               Foreground="Gray"
+                               IsHitTestVisible="False"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Left"/>
+                </Grid>
+
+                <Button x:Name="AddStepButton"
+                        Content="➕ Добавить шаг" 
+                        Height="35" 
+                        Width="120"
+                        Margin="0,5,0,10"
+                        HorizontalAlignment="Left"
+                        Background="LightGreen"
+                        Cursor="Hand"
+                        Click="AddStepButton_Click"/>
+
+                <ScrollViewer Height="200" VerticalScrollBarVisibility="Auto">
+                    <ListBox x:Name="StepsListBox" 
+                             ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+                </ScrollViewer>
             </StackPanel>
 
             <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20">

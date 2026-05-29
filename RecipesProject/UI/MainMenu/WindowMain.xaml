@@ -8,7 +8,6 @@
         Title="Рецепты" Height="450" Width="800"
         WindowStartupLocation="CenterScreen"
         MinHeight="400" MinWidth="600">
-
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>

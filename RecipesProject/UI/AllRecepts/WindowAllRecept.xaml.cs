@@ -2,17 +2,16 @@
 using RecipesProject.UI.FavRecepts;
 using RecipesProject.UI.NewRecepts;
 using RecipesProject.UI.MainMenu;
+
 namespace RecipesProject.UI.AllRecepts
 {
-    /// <summary>
-    /// Логика взаимодействия для WindowAllRecept.xaml
-    /// </summary>
     public partial class WindowAllRecept : Window
     {
         public WindowAllRecept()
         {
             InitializeComponent();
         }
+
         private void FavoriteBTN_Click(object sender, RoutedEventArgs e)
         {
             WindowFavRecept windowFavRecept = new WindowFavRecept();
@@ -34,5 +33,4 @@ namespace RecipesProject.UI.AllRecepts
             this.Close();
         }
     }
-    
 }

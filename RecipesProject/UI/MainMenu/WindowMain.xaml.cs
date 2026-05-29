@@ -1,28 +1,74 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using RecipesProject.UI.AllRecepts;   
-using RecipesProject.UI.FavRecepts;   
+using System.Windows.Media;
+using RecipesProject.Models;
+using RecipesProject.Data;
+using RecipesProject.UI.AllRecepts;
+using RecipesProject.UI.FavRecepts;
 using RecipesProject.UI.NewRecepts;
 
 namespace RecipesProject.UI.MainMenu
 {
     public partial class WindowMain : Window
     {
+        private RecipeRepository _repository;
+        private DBContext _dbContext;
+
         public WindowMain()
         {
             InitializeComponent();
-            MainContentControl.Content = new AllReceptsControl();
+
+            _dbContext = new DBContext();
+            _dbContext.Database.EnsureCreated();
+            _repository = new RecipeRepository(_dbContext);
+
+            LoadAllRecipes();
             ShowMainMenuButtons();
         }
 
-        // Метод для отображения кнопок главного меню
+        // Загрузка всех рецептов в главное окно
+        private void LoadAllRecipes()
+        {
+            try
+            {
+                var allReceptsControl = new AllReceptsControl();
+                allReceptsControl.RecipeSelected += AllReceptsControl_RecipeSelected;
+                MainContentControl.Content = allReceptsControl;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки рецептов: {ex.Message}", "Ошибка",
+                               MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        // выбора рецепта
+        private void AllReceptsControl_RecipeSelected(object sender, int recipeId)
+        {
+            var recipe = _repository.GetById(recipeId);
+            if (recipe != null)
+            {
+                MessageBox.Show($"📖 {recipe.Title}\n\n" +
+                               $"{recipe.Description}\n\n" +
+                               $"⏱️ Время: {recipe.CookingTime} мин\n" +
+                               $"👥 Порций: {recipe.Servings}\n" +
+                               $"📊 Сложность: {recipe.Difficulty}/5\n" +
+                               $"⭐ Избранное: {(recipe.IsFavorite == 1 ? "Да" : "Нет")}",
+                               "Просмотр рецепта",
+                               MessageBoxButton.OK,
+                               MessageBoxImage.Information);
+            }
+        }
+
+        // Глав меню
         private void ShowMainMenuButtons()
         {
             ButtonsPanel.Children.Clear();
 
             var favoriteBtn = CreateButton("❤ Любимое", "Favorite", 100);
-            var newReceptBtn = CreateButton("➕ Добавить", "NewRecept", 100);
+            var newReceptBtn = CreateButton("➕", "NewRecept", 100);
             var allReceptBtn = CreateButton("📖 Все рецепты", "AllRecepts", 120);
 
             favoriteBtn.Click += FavoriteBTN_Click;
@@ -34,16 +80,16 @@ namespace RecipesProject.UI.MainMenu
             ButtonsPanel.Children.Add(allReceptBtn);
         }
 
-        // Метод для отображения кнопок в режиме "Все рецепты"
+        // раздел все рецепты
         private void ShowAllReceptsButtons()
         {
             ButtonsPanel.Children.Clear();
             SearchBorder.Visibility = Visibility.Visible;
             SearchTextBox.Text = "ищите среди своих рецептов...";
-            SearchTextBox.Width = 400; // Делаем поисковик меньше
+            SearchTextBox.Width = 400;
 
             var favoriteBtn = CreateButton("❤ Любимое", "Favorite", 100);
-            var newReceptBtn = CreateButton("➕ Добавить", "NewRecept", 100);
+            var newReceptBtn = CreateButton("➕", "NewRecept", 100);
             var mainMenuBtn = CreateButton("🏠 Главный экран", "MainMenu", 140);
 
             favoriteBtn.Click += FavoriteBTN_Click;
@@ -55,16 +101,16 @@ namespace RecipesProject.UI.MainMenu
             ButtonsPanel.Children.Add(mainMenuBtn);
         }
 
-        // Метод для отображения кнопок в режиме "Любимое"
+        //раздел любимый
         private void ShowFavReceptsButtons()
         {
             ButtonsPanel.Children.Clear();
             SearchBorder.Visibility = Visibility.Visible;
             SearchTextBox.Text = "ищите среди своих рецептов...";
-            SearchTextBox.Width = 400; // Делаем поисковик меньше
+            SearchTextBox.Width = 400;
 
             var mainMenuBtn = CreateButton("🏠 Главный экран", "MainMenu", 140);
-            var newReceptBtn = CreateButton("➕ Добавить", "NewRecept", 100);
+            var newReceptBtn = CreateButton("➕", "NewRecept", 100);
             var allReceptBtn = CreateButton("📖 Все рецепты", "AllRecepts", 120);
 
             mainMenuBtn.Click += MainMenuBTN_Click;
@@ -76,20 +122,19 @@ namespace RecipesProject.UI.MainMenu
             ButtonsPanel.Children.Add(allReceptBtn);
         }
 
-        // Метод для отображения кнопок в режиме "Добавить рецепт"
+        // раздел адд рецепт
         private void ShowNewReceptButtons()
         {
             ButtonsPanel.Children.Clear();
-            SearchBorder.Visibility = Visibility.Collapsed; // Скрываем поиск
+            SearchBorder.Visibility = Visibility.Collapsed;
 
-            var backBtn = CreateButton("🔙 Вернуться на главный экран", "Back", 220);
+            var backBtn = CreateButton("Вернуться на главный экран", "Back", 220);
             backBtn.Click += MainMenuBTN_Click;
 
             ButtonsPanel.Children.Add(backBtn);
         }
 
-        // Вспомогательный метод для создания кнопок
-        private Button CreateButton(string content, string name, double width)
+        private Button CreateButton(string content, string name, double width, Brush background = null)
         {
             return new Button
             {
@@ -99,14 +144,17 @@ namespace RecipesProject.UI.MainMenu
                 Height = 40,
                 Margin = new Thickness(5),
                 FontSize = 14,
-                Cursor = Cursors.Hand
+                Cursor = Cursors.Hand,
+                Background = background ?? Brushes.IndianRed,
+                Foreground = Brushes.White
             };
         }
 
-        // Обработчики нажатий кнопок
         private void FavoriteBTN_Click(object sender, RoutedEventArgs e)
         {
-            MainContentControl.Content = new FavReceptsControl();
+            var favControl = new FavReceptsControl();
+            favControl.RecipeSelected += AllReceptsControl_RecipeSelected;
+            MainContentControl.Content = favControl;
             ShowFavReceptsButtons();
         }
 
@@ -118,17 +166,66 @@ namespace RecipesProject.UI.MainMenu
 
         private void AllReceptBTN_Click(object sender, RoutedEventArgs e)
         {
-            MainContentControl.Content = new AllReceptsControl();
+            LoadAllRecipes();
             ShowAllReceptsButtons();
         }
 
         private void MainMenuBTN_Click(object sender, RoutedEventArgs e)
         {
-            MainContentControl.Content = new AllReceptsControl();
+            LoadAllRecipes();
             ShowMainMenuButtons();
             SearchBorder.Visibility = Visibility.Visible;
             SearchTextBox.Text = "Поиск...";
-            SearchTextBox.Width = 500; // Возвращаем нормальный размер
+            SearchTextBox.Width = 500;
+        }
+
+
+        // холод
+        private void FridgeBTN_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Функция холодильника в разработке", "Информация",
+                           MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            _dbContext?.Dispose();
+            base.OnClosed(e);
+        }
+
+        private void SearchTextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (SearchTextBox.Text == "Поиск..." || SearchTextBox.Text == "ищите среди своих рецептов...")
+            {
+                SearchTextBox.Text = "";
+            }
+        }
+
+        private void SearchTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(SearchTextBox.Text))
+            {
+                SearchTextBox.Text = "Поиск...";
+            }
+        }
+
+        private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (MainContentControl?.Content is AllReceptsControl allReceptsControl)
+            {
+                string searchText = SearchTextBox.Text;
+
+                if (string.IsNullOrWhiteSpace(searchText) ||
+                    searchText == "Поиск..." ||
+                    searchText == "ищите среди своих рецептов...")
+                {
+                    allReceptsControl.LoadAllRecipes();
+                }
+                else
+                {
+                    allReceptsControl.SearchRecipes(searchText);
+                }
+            }
         }
     }
 }

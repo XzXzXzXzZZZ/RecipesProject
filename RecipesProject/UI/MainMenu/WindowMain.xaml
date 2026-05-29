@@ -16,25 +16,26 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Верхняя панель с поиском -->
-        <Border x:Name="SearchBorder" Grid.Row="0" Background="LightGray" Margin="10,10,10,0" CornerRadius="5" Visibility="Visible">
-            <Grid>
-                <TextBox x:Name="SearchTextBox" 
-                         Height="35" 
+		<Border x:Name="SearchBorder" Grid.Row="0" Background="LightGray" Margin="10,10,10,0" CornerRadius="5" Visibility="Visible">
+			<Grid>
+				<TextBox x:Name="SearchTextBox"
+                         Height="35"
                          Width="500"
-                         FontSize="18" 
+                         FontSize="18"
                          Text="Поиск..."
                          VerticalAlignment="Center"
                          HorizontalAlignment="Center"
                          Margin="10"
-                         Padding="5"/>
-            </Grid>
-        </Border>
-
-        <!-- Контентная область, которая будет меняться -->
+                         Padding="5"
+                         TextChanged="SearchTextBox_TextChanged"
+                         GotFocus="SearchTextBox_GotFocus"
+                         LostFocus="SearchTextBox_LostFocus"/>
+			</Grid>
+		</Border>
+		
+		
         <ContentControl x:Name="MainContentControl" Grid.Row="1" Margin="10"/>
 
-        <!-- Динамическая панель с кнопками -->
         <Border Grid.Row="2" Background="Transparent" Margin="10">
             <StackPanel x:Name="ButtonsPanel" Orientation="Horizontal" HorizontalAlignment="Center"/>
         </Border>

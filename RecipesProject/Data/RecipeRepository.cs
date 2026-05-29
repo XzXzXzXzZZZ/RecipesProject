@@ -7,8 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace RecipesProject.Data
-{
+namespace RecipesProject.Data{
     public class RecipeRepository
     {
         private readonly DBContext _context;
@@ -50,7 +49,6 @@ namespace RecipesProject.Data
 
             if (existing != null)
             {
-                // Обновляем ВСЕ поля кроме Id
                 existing.Title = updatedRecipe.Title;
                 existing.Description = updatedRecipe.Description;
                 existing.CookingTime = updatedRecipe.CookingTime;
@@ -60,7 +58,6 @@ namespace RecipesProject.Data
                 existing.MainPhotoPath = updatedRecipe.MainPhotoPath;
                 existing.UpdatedAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
-                // Обновляем связанные коллекции
                 _context.Steps.RemoveRange(existing.Steps);
                 existing.Steps = updatedRecipe.Steps;
 

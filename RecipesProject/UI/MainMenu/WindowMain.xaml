@@ -20,41 +20,43 @@
         <Border x:Name="SearchBorder" Grid.Row="0" Background="IndianRed" Margin="10,10,10,0" CornerRadius="5" Visibility="Visible">
             <Grid>
                 <TextBox x:Name="SearchTextBox" 
-                Height="35" 
-                Width="500"
-                FontSize="18"
-                VerticalAlignment="Center"
-                HorizontalAlignment="Center"
-                TextChanged="SearchTextBox_TextChanged"
-                Margin="10"
-                Padding="5"/>
+                    Height="35" 
+                    Width="500"
+                    FontSize="18"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    TextChanged="SearchTextBox_TextChanged"
+                    LostFocus="SearchTextBox_LostFocus"
+                    Margin="10"
+                    Padding="5"/>
 
                 <TextBlock x:Name="PlaceholderText"
-                Text="Найдите рецепт. . ."
-                Height="35" 
-                Width="500"
-                FontSize="18"
-                VerticalAlignment="Center"
-                HorizontalAlignment="Center"
-                Foreground="Gray"
-                Margin="10"
-                Padding="5"
-                IsHitTestVisible="False"/>
+                    Text="Найдите рецепт. . ."
+                    Height="35" 
+                    Width="500"
+                    FontSize="18"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    Foreground="Gray"
+                    Margin="10"
+                    Padding="5"
+                    IsHitTestVisible="False"/>
 
                 <Button
-                Name="FridgeBTN"
-                Content="Холодильник"
-                Height="35" 
-                Width="125"
-                FontSize="18"
-                VerticalAlignment="Center"
-                HorizontalAlignment="Right"
-                Background="LightGray"
-                Padding="5" 
-                Margin="10"
-                Click="FridgeBTN_Click"/>
+                    Name="FridgeBTN"
+                    Content="Холодильник"
+                    Height="35" 
+                    Width="125"
+                    FontSize="18"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Right"
+                    Background="LightGray"
+                    Padding="5" 
+                    Margin="10"
+                    Click="FridgeBTN_Click"/>
             </Grid>
         </Border>
+
 
         <ContentControl x:Name="MainContentControl" Grid.Row="1" Margin="10"/>
 

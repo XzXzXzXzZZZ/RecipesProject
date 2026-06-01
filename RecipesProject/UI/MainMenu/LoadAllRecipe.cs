@@ -6,13 +6,30 @@ namespace RecipesProject.UI.MainMenu
 {
     public partial class WindowMain : Window
     {
+        // Загрузка всех рецептов в главное окно
         private void LoadAllRecipes()
         {
-            var allReceptsControl = new AllReceptsControl();
-            allReceptsControl.RecipeSelected += OnRecipeSelected;
-            MainContentControl.Content = allReceptsControl;
+            try
+            {
+                var allReceptsControl = new AllReceptsControl();
+                allReceptsControl.RecipeSelected += AllReceptsControl_RecipeSelected;
+                MainContentControl.Content = allReceptsControl;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки рецептов: {ex.Message}", "Ошибка",
+                               MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
+        // выбора рецепта
+        private void AllReceptsControl_RecipeSelected(object sender, int recipeId)
+        {
+            MainContentControl.Content = new RecipeViewControl(recipeId);
+            ShowViewReceptButtons();
+        }
+
+        //-- Кнопки после выбора рецепта
         private void ShowViewReceptButtons()
         {
             ButtonsPanel.Children.Clear();
@@ -32,10 +49,5 @@ namespace RecipesProject.UI.MainMenu
             MessageBox.Show("Вы нажали на 'Изменить рецепт'. Эта кнопка должна открывать экран добавления рецепта, но с введенными данными");
         }
 
-        private void OnRecipeSelected(object sender, int selectedRecipeId)
-        {
-            MainContentControl.Content = new RecipeViewControl(selectedRecipeId);
-            ShowViewReceptButtons();
-        }
     }
 }

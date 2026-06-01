@@ -1,15 +1,12 @@
-﻿using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media;
-using Microsoft.EntityFrameworkCore;
+﻿using RecipesProject.Data;
 using RecipesProject.Models;
-using RecipesProject.UI.AllRecepts;   
+using RecipesProject.UI.AllRecepts;  
 using RecipesProject.UI.FavRecepts;   
 using RecipesProject.UI.NewRecepts;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace RecipesProject.UI.MainMenu
 {
@@ -18,13 +15,11 @@ namespace RecipesProject.UI.MainMenu
         public WindowMain()
         {
             InitializeComponent();
-
-            AddTestData.push();
             LoadAllRecipes();
             ShowMainMenuButtons();
         }
 
-        //КНОПКИ ГЛАВ МЕНЮ
+        // Глав меню
         private void ShowMainMenuButtons()
         {
             ButtonsPanel.Children.Clear();
@@ -47,8 +42,8 @@ namespace RecipesProject.UI.MainMenu
         {
             ButtonsPanel.Children.Clear();
             SearchBorder.Visibility = Visibility.Visible;
-            SearchTextBox.Text = "ищите среди своих рецептов...";
-            SearchTextBox.Width = 400;
+            PlaceholderText.Text = "Найдите рецепт. . .";
+            SearchTextBox.Width = 500;
 
             var favoriteBtn = CreateButton("❤ Любимое", "Favorite", 100);
             var newReceptBtn = CreateButton("➕", "NewRecept", 100);
@@ -68,8 +63,8 @@ namespace RecipesProject.UI.MainMenu
         {
             ButtonsPanel.Children.Clear();
             SearchBorder.Visibility = Visibility.Visible;
-            SearchTextBox.Text = "ищите среди своих рецептов...";
-            SearchTextBox.Width = 400;
+            PlaceholderText.Text = "Найдите рецепт среди избранных. . .";
+            SearchTextBox.Width = 500;
 
             var mainMenuBtn = CreateButton("🏠 Главный экран", "MainMenu", 140);
             var newReceptBtn = CreateButton("➕", "NewRecept", 100);
@@ -88,7 +83,7 @@ namespace RecipesProject.UI.MainMenu
         private void ShowNewReceptButtons()
         {
             ButtonsPanel.Children.Clear();
-            SearchBorder.Visibility = Visibility.Collapsed; //поисковик офф
+            SearchBorder.Visibility = Visibility.Collapsed;
 
             var backBtn = CreateButton("Вернуться на главный экран", "Back", 220);
             backBtn.Click += MainMenuBTN_Click;
@@ -114,10 +109,12 @@ namespace RecipesProject.UI.MainMenu
             };
         }
 
-        //обробатывают нажатия кнопок
+        //-- Обработчики нажатий кнопок
         private void FavoriteBTN_Click(object sender, RoutedEventArgs e)
         {
-            MainContentControl.Content = new FavReceptsControl();
+            var favControl = new FavReceptsControl();
+            favControl.RecipeSelected += AllReceptsControl_RecipeSelected;
+            MainContentControl.Content = favControl;
             ShowFavReceptsButtons();
         }
 
@@ -138,14 +135,15 @@ namespace RecipesProject.UI.MainMenu
             LoadAllRecipes();
             ShowMainMenuButtons();
             SearchBorder.Visibility = Visibility.Visible;
-            SearchTextBox.Text = "Поиск...";
+            PlaceholderText.Text = "Найдите рецепт. . .";
             SearchTextBox.Width = 500;
         }
 
-        private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        private void SearchTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
-            PlaceholderText.Visibility = string.IsNullOrEmpty(SearchTextBox.Text) ? Visibility.Visible : Visibility.Collapsed;
+            SearchTextBox.Text = "";
         }
+
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ///           ХОЛОДИЛЬНИК
         private void FridgeBTN_Click(object sender, RoutedEventArgs e)
@@ -175,6 +173,42 @@ namespace RecipesProject.UI.MainMenu
             if (MainContentControl.Content is Fridge.FridgeControl fridgeControl)
             {
                 fridgeControl.ClearAllSelections();
+            }
+            SearchTextBox.Width = 500;
+        }
+
+        private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (MainContentControl?.Content is AllReceptsControl allReceptsControl)
+            {
+                string searchText = SearchTextBox.Text;
+
+                if (string.IsNullOrWhiteSpace(searchText))
+                {
+                    PlaceholderText.Visibility = Visibility.Visible;
+                    allReceptsControl.LoadAllRecipes();
+                }
+                else
+                {
+                    PlaceholderText.Visibility = Visibility.Collapsed;
+                    allReceptsControl.SearchRecipes(searchText);
+                }
+            }
+
+            if(MainContentControl?.Content is FavReceptsControl favReceptsControl)
+            {
+                string searchText = SearchTextBox.Text;
+
+                if (string.IsNullOrWhiteSpace(searchText))
+                {
+                    PlaceholderText.Visibility = Visibility.Visible;
+                    favReceptsControl.LoadFavorites();
+                }
+                else
+                {
+                    PlaceholderText.Visibility = Visibility.Collapsed;
+                    favReceptsControl.SearchRecipesInFavorite(searchText);
+                }
             }
         }
     }

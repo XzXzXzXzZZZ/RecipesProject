@@ -1,17 +1,15 @@
-﻿using RecipesProject.UI.AllRecepts;
-using RecipesProject.UI.FavRecepts;
+﻿using RecipesProject.Data;
+using RecipesProject.Models;
+using RecipesProject.UI.AllRecepts;
+using RecipesProject.UI.NewRecepts;
 using RecipesProject.UI.ViewingRecipe;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace RecipesProject.UI.MainMenu
 {
     public partial class WindowMain : Window
     {
+        private int? idRecipe = null;
         private void LoadAllRecipes()
         {
             //-- Создаем контрол для списка рецептов
@@ -40,13 +38,32 @@ namespace RecipesProject.UI.MainMenu
         //-- Обработчик кнопки обновления
         private void UpdateBTN_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Вы нажали на 'Изменить рецепт'. Эта кнопка должна открывать экран добавления рецепта, но с вбитыми данными");
+            if(idRecipe != null)
+            {
+                using(DBContext dBContext = new DBContext())
+                {
+                    RecipeRepository recipeRepository = new RecipeRepository(dBContext);
+                    var recipe = recipeRepository.GetById((int)idRecipe);
+
+                    //-- Очищаем временное хранилище и заполняем данными рецепта, который обновляем
+                    TemporarySavingRecipe.Clear();
+                    TemporarySavingRecipe.Id = (int)idRecipe;
+                    TemporarySavingRecipe.Title = recipe.Title;
+                    TemporarySavingRecipe.CookingTime = CookingTimeMethods.ConvertingFromMinutesToString(recipe.CookingTime);
+                    TemporarySavingRecipe.IngredientsText += '\n' + String.Join('\n', recipe.Ingredients.Select(i => i.Text).ToList());
+                    TemporarySavingRecipe.Steps = recipe.Steps.Select(i => i.Description).ToList();
+                }
+
+                MainContentControl.Content = new NewReceptControl();
+                ShowNewReceptButtons();
+            }
         }
 
         //-- Обработчик события
         private void OnRecipeSelected(object sender, int selectedRecipeId)
         {
             MainContentControl.Content = new RecipeViewControl(selectedRecipeId);
+            idRecipe = selectedRecipeId;
             ShowViewReceptButtons();
         }
 

@@ -3,13 +3,9 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Microsoft.EntityFrameworkCore;
-using RecipesProject.Models;
-using RecipesProject.UI.AllRecepts;   
+using RecipesProject.Models; 
 using RecipesProject.UI.FavRecepts;   
 using RecipesProject.UI.NewRecepts;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
 
 namespace RecipesProject.UI.MainMenu
 {
@@ -19,9 +15,14 @@ namespace RecipesProject.UI.MainMenu
         {
             InitializeComponent();
 
+            //-- Применение миграций
+            //using(DBContext dbContext = new DBContext())
+            //{
+            //    dbContext.Database.Migrate();
+            //}
+
             AddTestData.push();
-            LoadAllRecipes();
-            ShowMainMenuButtons();
+            loadMainMenu();
         }
 
         //КНОПКИ ГЛАВ МЕНЮ
@@ -123,6 +124,8 @@ namespace RecipesProject.UI.MainMenu
 
         private void NewReceptBTN_Click(object sender, RoutedEventArgs e)
         {
+            //-- Обязательная очистка временного хранилища
+            TemporarySavingRecipe.Clear();
             MainContentControl.Content = new NewReceptControl();
             ShowNewReceptButtons();
         }
@@ -134,6 +137,11 @@ namespace RecipesProject.UI.MainMenu
         }
 
         private void MainMenuBTN_Click(object sender, RoutedEventArgs e)
+        {
+            loadMainMenu();
+        }
+
+        public void loadMainMenu()
         {
             LoadAllRecipes();
             ShowMainMenuButtons();

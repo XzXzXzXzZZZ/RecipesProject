@@ -1,35 +1,140 @@
 ﻿<UserControl x:Class="RecipesProject.UI.ViewingRecipe.RecipeViewControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <ScrollViewer Background="White">
-        <Grid x:Name="gridView">
+
+    <UserControl.Resources>
+        <Style x:Key="NormalTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="Foreground" Value="#FF333333"/>
+        </Style>
+
+        <Style x:Key="LabelTextStyle" TargetType="Label">
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="Foreground" Value="#FF333333"/>
+        </Style>
+
+        <Style x:Key="BoldHeaderStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#FF333333"/>
+            <Setter Property="Margin" Value="0,10,0,5"/>
+        </Style>
+
+        <Style x:Key="ContentBoxStyle" TargetType="Border">
+            <Setter Property="Background" Value="#FFF9F9F9"/>
+            <Setter Property="BorderBrush" Value="#FFCCCCCC"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="5"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="Margin" Value="0,0,0,15"/>
+        </Style>
+
+        <Style x:Key="StepBoxStyle" TargetType="Border">
+            <Setter Property="Background" Value="#FFF9F9F9"/>
+            <Setter Property="BorderBrush" Value="#FFCCCCCC"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="5"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+        </Style>
+    </UserControl.Resources>
+
+    <ScrollViewer Background="White" VerticalScrollBarVisibility="Auto">
+        <Grid x:Name="gridView" Margin="20">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!--<Border BorderBrush="Black" BorderThickness="1" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3">
-                <Grid Height="100">
-                    <Label Content="Photo" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                </Grid>
-            </Border>-->
-            <Button x:Name="IsFavoriteBtn" Grid.Row="0" Grid.Column="2" Content="В избранное" Click="IsFavoriteBtn_Click"/>
-            <Label x:Name="NameRecipe" Content="Название рецепта" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Center"/>
-            <Label x:Name="DifficultyRecipe" Content="Сложность: " Grid.Row="3" Grid.Column="0"/>
-            <Label x:Name="CookingTimeRecipe" Content="Время приготовления: " Grid.Row="3" Grid.Column="1"/>
-            <Label x:Name="ServingsRecipe" Content="Количество порций: " Grid.Row="3" Grid.Column="2"/>
-            <TextBlock x:Name="DescriptionRecipe" TextWrapping="Wrap" Text="Описание рецепта" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3"/>
-            <TextBlock x:Name="IngredientRecipe" TextWrapping="Wrap" Text="Ингридиенты:" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3"/>
+            <!-- Кнопка "избранное" -->
+            <Button x:Name="IsFavoriteBtn" 
+                    Grid.Row="0" Grid.Column="2" 
+                    Width="140" Height="35"
+                    Margin="0,0,0,10"
+                    HorizontalAlignment="Right"
+                    Background="#FFE0E0E0"
+                    Foreground="#FF333333"
+                    FontSize="14"
+                    Cursor="Hand"
+                    BorderThickness="1"
+                    BorderBrush="#FFCCCCCC"
+                    Click="IsFavoriteBtn_Click"/>
 
+            <!-- Название-->
+            <Label x:Name="NameRecipe" 
+                   Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
+                   Content="Название рецепта" 
+                   FontSize="24" 
+                   FontWeight="Bold"
+                   Foreground="#FF333333"
+                   HorizontalAlignment="Center"
+                   HorizontalContentAlignment="Center"
+                   Margin="0,10,0,15"/>
+
+            <!-- Строка с информацией (сложность, время готовки, колво порций) -->
+            <WrapPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" 
+                       Margin="0,0,0,15"
+                       HorizontalAlignment="Center">
+
+                <Border Background="#FFF0F0F0" CornerRadius="5" Padding="10,5" Margin="5">
+                    <Label x:Name="DifficultyRecipe" 
+                           Content="Сложность: " 
+                           FontSize="16"
+                           Foreground="#FF333333"
+                           Padding="0"/>
+                </Border>
+
+                <Border Background="#FFF0F0F0" CornerRadius="5" Padding="10,5" Margin="5">
+                    <Label x:Name="CookingTimeRecipe" 
+                           Content="Время приготовления: " 
+                           FontSize="16"
+                           Foreground="#FF333333"
+                           Padding="0"/>
+                </Border>
+
+                <Border Background="#FFF0F0F0" CornerRadius="5" Padding="10,5" Margin="5">
+                    <Label x:Name="ServingsRecipe" 
+                           Content="Количество порций: " 
+                           FontSize="16"
+                           Foreground="#FF333333"
+                           Padding="0"/>
+                </Border>
+            </WrapPanel>
+
+            <!-- Описание рецепта -->
+            <StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3">
+                <TextBlock Text="Описание" Style="{StaticResource BoldHeaderStyle}"/>
+                <Border Style="{StaticResource ContentBoxStyle}">
+                    <TextBlock x:Name="DescriptionRecipe" 
+                               Text="Описание рецепта" 
+                               TextWrapping="Wrap"
+                               FontSize="16"
+                               Foreground="#FF444444"/>
+                </Border>
+            </StackPanel>
+
+            <!-- Ингредиенты -->
+            <StackPanel Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3">
+                <TextBlock Text="Ингредиенты" Style="{StaticResource BoldHeaderStyle}"/>
+                <Border Style="{StaticResource ContentBoxStyle}">
+                    <TextBlock x:Name="IngredientRecipe" 
+                               Text="Ингредиенты:" 
+                               TextWrapping="Wrap"
+                               FontSize="16"
+                               Foreground="#FF444444"/>
+                </Border>
+            </StackPanel>
+
+            <!-- тут будут шаги (потом)((когда-нибудь)) -->
         </Grid>
     </ScrollViewer>
 </UserControl>

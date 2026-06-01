@@ -3,7 +3,6 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 
 namespace RecipesProject.UI.NewRecepts
 {
@@ -13,31 +12,35 @@ namespace RecipesProject.UI.NewRecepts
         private string recipeName;
         private string ingredients;
 
-        public StepControl(string recipeName, string ingredients)
-        {
-            InitializeComponent();
-            this.recipeName = recipeName;
-            this.ingredients = ingredients;
-            RecipeNameText.Text = recipeName;
-            StepsListBox.ItemsSource = steps;
-
-            // Начальное состояние для поля шагов
-            StepTextBox.Text = "";
-            UpdatePlaceholderVisibility();
-
-            // Начальное состояние для полей времени
-            HoursTextBox.Text = "";
-            MinutesTextBox.Text = "";
-            UpdateHoursPlaceholderVisibility();
-            UpdateMinutesPlaceholderVisibility();
-        }
+        //-- Событие сохранения
+        public Action OnRecipeSaved { get; set; }
 
         public StepControl()
         {
             InitializeComponent();
+
+            //-- Подгружаем данные из временного хранилища, если те имеются
+            this.recipeName = (!String.IsNullOrEmpty(TemporarySavingRecipe.Title) ?
+            TemporarySavingRecipe.Title : "");
+
+            this.ingredients = (!String.IsNullOrEmpty(TemporarySavingRecipe.IngredientsText) ?
+                TemporarySavingRecipe.IngredientsText : "");
+
+            RecipeNameText.Text = (!String.IsNullOrEmpty(TemporarySavingRecipe.Title) ?
+                TemporarySavingRecipe.Title : "");
+
+            StepsListBox.ItemsSource = steps;
+            if(TemporarySavingRecipe.Steps!= null)
+                for(int i=0; i < TemporarySavingRecipe.Steps.Count; i++)
+                {
+                    steps.Add($"Шаг {i+1}: " + TemporarySavingRecipe.Steps[i]);
+                }
+
+            var time = CookingTimeMethods.ConvertingTimeString(TemporarySavingRecipe.CookingTime);
+            HoursTextBox.Text = $"{((time.hour == 0)? "": time.hour)}";
+            MinutesTextBox.Text = $"{((time.minute == 0) ? "": time.minute)}";
+
             StepTextBox.Text = "";
-            HoursTextBox.Text = "";
-            MinutesTextBox.Text = "";
             UpdatePlaceholderVisibility();
             UpdateHoursPlaceholderVisibility();
             UpdateMinutesPlaceholderVisibility();
@@ -181,6 +184,14 @@ namespace RecipesProject.UI.NewRecepts
             var parent = this.Parent as ContentControl;
             if (parent != null)
             {
+                //-- Перед переходом сохраняем данные
+                Regex regex = new Regex(@"^Шаг\s*\d+\s*:\s*");
+
+                TemporarySavingRecipe.Title = recipeName;
+                TemporarySavingRecipe.IngredientsText = ingredients;
+                TemporarySavingRecipe.Steps = steps.Select(s => regex.Replace(s, "")).ToList();
+                TemporarySavingRecipe.CookingTime = FormatCookingTime();
+
                 parent.Content = new NewReceptControl();
             }
         }
@@ -229,11 +240,27 @@ namespace RecipesProject.UI.NewRecepts
             string allSteps = string.Join("\n", steps);
             string cookingTime = FormatCookingTime();
 
-            MessageBox.Show($"Рецепт \"{recipeName}\" успешно сохранен!\n\n" +
+            List<string> stepsString = steps.ToList();
+
+            try
+            {
+                NewAndUpdateRecipe.CreateAndSaveRecipe(recipeName, ingredients, cookingTime, stepsString, TemporarySavingRecipe.Id);
+
+                MessageBox.Show($"Рецепт \"{recipeName}\" успешно сохранен!\n\n" +
                 $"Ингредиенты:\n{ingredients}\n\n" +
                 $"Время приготовления: {cookingTime}\n\n" +
                 $"Шаги:\n{allSteps}",
                 "Успех!", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                OnRecipeSaved?.Invoke();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка добавления рецепта {ex.Message}", "Ошибка",
+                   MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            
         }
     }
 }

@@ -1,11 +1,16 @@
-﻿using RecipesProject.UI.AllRecepts;
+﻿using RecipesProject.Data;
+using RecipesProject.UI.AllRecepts;
+using RecipesProject.UI.NewRecepts;
 using RecipesProject.UI.ViewingRecipe;
 using System.Windows;
+using RecipesProject.Models;
 
 namespace RecipesProject.UI.MainMenu
 {
     public partial class WindowMain : Window
     {
+        private int? idRecipe = null;
+
         // Загрузка всех рецептов в главное окно
         private void LoadAllRecipes()
         {
@@ -26,6 +31,7 @@ namespace RecipesProject.UI.MainMenu
         private void AllReceptsControl_RecipeSelected(object sender, int recipeId)
         {
             MainContentControl.Content = new RecipeViewControl(recipeId);
+            idRecipe = recipeId;
             ShowViewReceptButtons();
         }
 
@@ -46,7 +52,25 @@ namespace RecipesProject.UI.MainMenu
 
         private void UpdateBTN_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Вы нажали на 'Изменить рецепт'. Эта кнопка должна открывать экран добавления рецепта, но с введенными данными");
+            if (idRecipe != null)
+            {
+                using (DBContext dBContext = new DBContext())
+                {
+                    RecipeRepository recipeRepository = new RecipeRepository(dBContext);
+                    var recipe = recipeRepository.GetById((int)idRecipe);
+
+                    //-- Очищаем временное хранилище и заполняем данными рецепта, который обновляем
+                    TemporarySavingRecipe.Clear();
+                    TemporarySavingRecipe.Id = (int)idRecipe;
+                    TemporarySavingRecipe.Title = recipe.Title;
+                    TemporarySavingRecipe.CookingTime = CookingTimeMethods.ConvertingFromMinutesToString(recipe.CookingTime);
+                    TemporarySavingRecipe.IngredientsText += '\n' + String.Join('\n', recipe.Ingredients.Select(i => i.Text).ToList());
+                    TemporarySavingRecipe.Steps = recipe.Steps.Select(i => i.Description).ToList();
+                }
+
+                MainContentControl.Content = new NewReceptControl();
+                ShowNewReceptButtons();
+            }
         }
 
     }

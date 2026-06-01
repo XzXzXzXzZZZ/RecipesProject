@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using RecipesProject.UI.MainMenu;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
@@ -9,6 +10,13 @@ namespace RecipesProject.UI.NewRecepts
         public NewReceptControl()
         {
             InitializeComponent();
+
+            //-- Подгружаем данные из временного хранилища, если таковы есть
+            NameTextBox.Text = (!String.IsNullOrEmpty(TemporarySavingRecipe.Title) ?
+               TemporarySavingRecipe.Title : "");
+            IngredientsTextBox.Text = (!String.IsNullOrEmpty(TemporarySavingRecipe.IngredientsText) ?
+                TemporarySavingRecipe.IngredientsText : "");
+
             if (SearchIngredientTextBox != null)
             {
                 SearchIngredientTextBox.Text = "Какой ингредиент вы ищете?";
@@ -57,7 +65,24 @@ namespace RecipesProject.UI.NewRecepts
             var parent = this.Parent as ContentControl;
             if (parent != null)
             {
-                parent.Content = new StepControl(NameTextBox.Text, IngredientsTextBox.Text);
+                //-- Перед переходом в другой контроллер сохраняем данные
+                TemporarySavingRecipe.Title = NameTextBox.Text;
+                TemporarySavingRecipe.IngredientsText = IngredientsTextBox.Text;
+
+                var stepControl = new StepControl();
+                stepControl.OnRecipeSaved = () => ReturnToMainScreen();
+                parent.Content = stepControl;
+            }
+        }
+
+        //-- При вызове события сохранения - переходим в главное меню
+        private void ReturnToMainScreen()
+        {
+            //-- Возвращаемся на главный экран
+            var windowMain = Application.Current.MainWindow as WindowMain;
+            if (windowMain != null)
+            {
+                windowMain.loadMainMenu();
             }
         }
     }

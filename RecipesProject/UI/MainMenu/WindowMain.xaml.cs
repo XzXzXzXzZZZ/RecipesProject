@@ -1,12 +1,10 @@
-﻿using RecipesProject.Data;
-using RecipesProject.Models;
-using RecipesProject.UI.AllRecepts;  
-using RecipesProject.UI.FavRecepts;   
-using RecipesProject.UI.NewRecepts;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using RecipesProject.UI.AllRecepts;  
+using RecipesProject.UI.FavRecepts;   
+using RecipesProject.UI.NewRecepts;
 
 namespace RecipesProject.UI.MainMenu
 {
@@ -15,8 +13,7 @@ namespace RecipesProject.UI.MainMenu
         public WindowMain()
         {
             InitializeComponent();
-            LoadAllRecipes();
-            ShowMainMenuButtons();
+            loadMainMenu();
         }
 
         // Глав меню
@@ -120,6 +117,8 @@ namespace RecipesProject.UI.MainMenu
 
         private void NewReceptBTN_Click(object sender, RoutedEventArgs e)
         {
+            //-- Обязательная очистка временного хранилища
+            TemporarySavingRecipe.Clear();
             MainContentControl.Content = new NewReceptControl();
             ShowNewReceptButtons();
         }
@@ -131,6 +130,11 @@ namespace RecipesProject.UI.MainMenu
         }
 
         private void MainMenuBTN_Click(object sender, RoutedEventArgs e)
+        {
+            loadMainMenu();
+        }
+
+        public void loadMainMenu()
         {
             LoadAllRecipes();
             ShowMainMenuButtons();

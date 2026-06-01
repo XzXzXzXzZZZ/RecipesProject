@@ -54,8 +54,8 @@ namespace RecipesProject.Data
                 existing.Title = updatedRecipe.Title;
                 existing.Description = updatedRecipe.Description;
                 existing.CookingTime = updatedRecipe.CookingTime;
-                existing.Difficulty = updatedRecipe.Difficulty;
-                existing.Servings = updatedRecipe.Servings;
+                existing.Difficulty = (updatedRecipe.Difficulty != null)? updatedRecipe.Difficulty : 0;
+                existing.Servings = (updatedRecipe.Servings != null) ? updatedRecipe.Servings : 4;
                 existing.IsFavorite = updatedRecipe.IsFavorite;
                 existing.MainPhotoPath = updatedRecipe.MainPhotoPath;
                 existing.UpdatedAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");

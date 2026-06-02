@@ -29,7 +29,17 @@ namespace RecipesProject.UI.ViewingRecipe
         void loadInfoStep(Step step)
         {
             NumberStep.Content += step.StepNumber.ToString();
+            ViewImage.Source = ImageMethods.readImage(step.PhotoPath);
             DescriptionStep.Text = step.Description;
+        }
+
+        public void Cleanup()
+        {
+            // Очищаем изображение шага, если оно есть
+            if (ViewImage != null)
+            {
+                ViewImage.Source = null;
+            }
         }
     }
 }

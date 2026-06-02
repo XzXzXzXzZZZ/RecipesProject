@@ -1,4 +1,6 @@
-﻿using System.Collections.ObjectModel;
+﻿using Microsoft.Win32;
+using RecipesProject.Models;
+using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
@@ -8,42 +10,50 @@ namespace RecipesProject.UI.NewRecepts
 {
     public partial class StepControl : UserControl
     {
-        private ObservableCollection<string> steps = new ObservableCollection<string>();
-        private string recipeName;
-        private string ingredients;
+        private ObservableCollection<StepItem> steps = new ObservableCollection<StepItem>();
+        Recipe recipe;
+        string? pathImage = null;
 
         //-- Событие сохранения
         public Action OnRecipeSaved { get; set; }
 
-        public StepControl()
+        public StepControl(Recipe recipe)
         {
             InitializeComponent();
-
-            //-- Подгружаем данные из временного хранилища, если те имеются
-            this.recipeName = (!String.IsNullOrEmpty(TemporarySavingRecipe.Title) ?
-            TemporarySavingRecipe.Title : "");
-
-            this.ingredients = (!String.IsNullOrEmpty(TemporarySavingRecipe.IngredientsText) ?
-                TemporarySavingRecipe.IngredientsText : "");
-
-            RecipeNameText.Text = (!String.IsNullOrEmpty(TemporarySavingRecipe.Title) ?
-                TemporarySavingRecipe.Title : "");
-
+            this.recipe = recipe;
             StepsListBox.ItemsSource = steps;
-            if(TemporarySavingRecipe.Steps!= null)
-                for(int i=0; i < TemporarySavingRecipe.Steps.Count; i++)
-                {
-                    steps.Add($"Шаг {i+1}: " + TemporarySavingRecipe.Steps[i]);
-                }
 
-            var time = CookingTimeMethods.ConvertingTimeString(TemporarySavingRecipe.CookingTime);
-            HoursTextBox.Text = $"{((time.hour == 0)? "": time.hour)}";
-            MinutesTextBox.Text = $"{((time.minute == 0) ? "": time.minute)}";
-
+            LoadDataFromTemporarySaving();
             StepTextBox.Text = "";
             UpdatePlaceholderVisibility();
             UpdateHoursPlaceholderVisibility();
             UpdateMinutesPlaceholderVisibility();
+        }
+
+        //-- Подгружаем данные из временного хранилища, если таковы есть
+        void LoadDataFromTemporarySaving()
+        {
+            if (recipe != null)
+            {
+                RecipeNameText.Text = (!String.IsNullOrEmpty(recipe.Title) ?
+               recipe.Title : "");
+
+                if (recipe.Steps != null)
+                    foreach(var  step in recipe.Steps)
+                    {
+                        steps.Add( new StepItem() { Description = $"Шаг {step.StepNumber}: " + step.Description, 
+                            ImagePath = step.PhotoPath});
+                    }
+
+                var time = CookingTimeMethods.ConvertingTimeMinute(recipe.CookingTime);
+                HoursTextBox.Text = $"{((time.hour == 0) ? "" : time.hour)}";
+                MinutesTextBox.Text = $"{((time.minute == 0) ? "" : time.minute)}";
+            }
+            else
+            {
+                RecipeNameText.Text = "Ошибка получения рецепта";
+            }
+            
         }
 
         private void UpdatePlaceholderVisibility()
@@ -86,6 +96,40 @@ namespace RecipesProject.UI.NewRecepts
         private void StepTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             UpdatePlaceholderVisibility();
+        }
+
+        //-- Удаление шага
+        private void DeleteSelectedStep_Click(object sender, RoutedEventArgs e)
+        {
+            if (StepsListBox.SelectedItem != null)
+            {
+                StepItem step = (StepItem)StepsListBox.SelectedItem;
+
+                var result = MessageBox.Show($"Удалить шаг?\n{step.Description}",
+                    "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    steps.Remove(step);
+
+                    Regex regex = new Regex(@"^Шаг\s*\d+\s*:\s*");
+                    List<StepItem> items = new List<StepItem>(steps);
+                    steps.Clear();
+                    for (int i = 0; i < items.Count; i++)
+                    {
+                        steps.Add(new StepItem
+                        {
+                            Description = regex.Replace(items[i].Description, $"Шаг {i + 1}: "),
+                            ImagePath = items[i].ImagePath
+                        });
+                    }
+                }
+            }
+            else
+            {
+                MessageBox.Show("Сначала выберите шаг левой кнопкой", "Подсказка",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+            }
         }
 
         // Обработчики для часов
@@ -167,7 +211,10 @@ namespace RecipesProject.UI.NewRecepts
         {
             if (!string.IsNullOrWhiteSpace(StepTextBox.Text))
             {
-                steps.Add($"Шаг {steps.Count + 1}: {StepTextBox.Text}");
+                steps.Add(new StepItem() { Description = $"Шаг {steps.Count + 1}: {StepTextBox.Text}", ImagePath = pathImage} );
+                ViewImage.Source = null;
+                pathImage = null;
+
                 StepTextBox.Clear();
                 UpdatePlaceholderVisibility();
                 StepTextBox.Focus();
@@ -184,15 +231,35 @@ namespace RecipesProject.UI.NewRecepts
             var parent = this.Parent as ContentControl;
             if (parent != null)
             {
-                //-- Перед переходом сохраняем данные
-                Regex regex = new Regex(@"^Шаг\s*\d+\s*:\s*");
+                Save();
+                parent.Content = new NewReceptControl(recipe);
+            }
+        }
 
-                TemporarySavingRecipe.Title = recipeName;
-                TemporarySavingRecipe.IngredientsText = ingredients;
-                TemporarySavingRecipe.Steps = steps.Select(s => regex.Replace(s, "")).ToList();
-                TemporarySavingRecipe.CookingTime = FormatCookingTime();
-
-                parent.Content = new NewReceptControl();
+        //-- Перед переходом сохраняем данные
+        void Save()
+        {
+            if (recipe != null)
+            {
+                recipe.Steps = new List<Step>();
+                Regex regex = new Regex(@"Шаг\s*(\d+)\s*:\s*(.*)");
+                foreach (var item in steps)
+                {
+                    Match match = regex.Match(item.Description);
+                    if (match.Success)
+                    {
+                        Step step = new Step()
+                        {
+                            StepNumber = int.Parse(match.Groups[1].Value),
+                            Description = match.Groups[2].Value,
+                            PhotoPath = item.ImagePath,
+                            Recipe = recipe
+                        };
+                        recipe.Steps.Add(step);
+                    }
+                }
+                string stringTime = FormatCookingTime();
+                recipe.CookingTime = CookingTimeMethods.ConvertingTimeFromStringToMinutes(stringTime);
             }
         }
 
@@ -237,19 +304,12 @@ namespace RecipesProject.UI.NewRecepts
                 return;
             }
 
-            string allSteps = string.Join("\n", steps);
-            string cookingTime = FormatCookingTime();
-
-            List<string> stepsString = steps.ToList();
-
             try
             {
-                NewAndUpdateRecipe.CreateAndSaveRecipe(recipeName, ingredients, cookingTime, stepsString, TemporarySavingRecipe.Id);
+                Save();
+                NewAndUpdateRecipe.SaveRecipe(recipe);
 
-                MessageBox.Show($"Рецепт \"{recipeName}\" успешно сохранен!\n\n" +
-                $"Ингредиенты:\n{ingredients}\n\n" +
-                $"Время приготовления: {cookingTime}\n\n" +
-                $"Шаги:\n{allSteps}",
+                MessageBox.Show("Рецепт успешно сохранен!",
                 "Успех!", MessageBoxButton.OK, MessageBoxImage.Information);
 
                 OnRecipeSaved?.Invoke();
@@ -261,6 +321,26 @@ namespace RecipesProject.UI.NewRecepts
             }
 
             
+        }
+
+        private void AddStepImageButton_Click(object sender, RoutedEventArgs e)
+        {
+            var openFileDialog = new OpenFileDialog
+            {
+                Title = "Выберите изображение",
+                Filter = "Изображения (*.jpg;*.jpeg;*.png;*.bmp)|*.jpg;*.jpeg;*.png;*.bmp|Все файлы (*.*)|*.*",
+                Multiselect = false
+            };
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                string filePath = openFileDialog.FileName;
+
+                //-- Подгрузка фото
+                ViewImage.Source = ImageMethods.readImage(filePath); ;
+
+                pathImage = filePath;
+            }
         }
     }
 }

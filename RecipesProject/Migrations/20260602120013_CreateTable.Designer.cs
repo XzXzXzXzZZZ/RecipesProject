@@ -11,8 +11,8 @@ using RecipesProject.Models;
 namespace RecipesProject.Migrations
 {
     [DbContext(typeof(DBContext))]
-    [Migration("20260525132548_CreateTables")]
-    partial class CreateTables
+    [Migration("20260602120013_CreateTable")]
+    partial class CreateTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -41,7 +41,8 @@ namespace RecipesProject.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RecipeId");
+                    b.HasIndex("RecipeId")
+                        .IsUnique();
 
                     b.ToTable("Ingredients");
                 });
@@ -168,8 +169,8 @@ namespace RecipesProject.Migrations
             modelBuilder.Entity("RecipesProject.Models.Ingredient", b =>
                 {
                     b.HasOne("RecipesProject.Models.Recipe", "Recipe")
-                        .WithMany("Ingredients")
-                        .HasForeignKey("RecipeId")
+                        .WithOne("Ingredient")
+                        .HasForeignKey("RecipesProject.Models.Ingredient", "RecipeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -189,7 +190,7 @@ namespace RecipesProject.Migrations
 
             modelBuilder.Entity("RecipesProject.Models.Recipe", b =>
                 {
-                    b.Navigation("Ingredients");
+                    b.Navigation("Ingredient");
 
                     b.Navigation("Steps");
                 });

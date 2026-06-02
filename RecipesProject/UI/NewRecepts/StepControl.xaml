@@ -35,6 +35,8 @@
             <StackPanel Grid.Row="2" Margin="0,0,0,15">
                 <TextBlock Text="Шаги приготовления:" FontSize="18" Margin="0,0,0,5"/>
 
+                <Image x:Name="ViewImage"/>
+                
                 <!-- Поле для ввода шага с подсказкой внутри -->
                 <Grid Margin="0,0,0,10" Width="400" HorizontalAlignment="Left">
                     <TextBox x:Name="StepTextBox" 
@@ -55,19 +57,58 @@
                                HorizontalAlignment="Left"/>
                 </Grid>
 
-                <Button x:Name="AddStepButton"
-                        Content="➕ Добавить шаг" 
-                        Height="35" 
-                        Width="120"
-                        Margin="0,5,0,10"
-                        HorizontalAlignment="Left"
-                        Background="LightGreen"
-                        Cursor="Hand"
-                        Click="AddStepButton_Click"/>
+                <StackPanel Orientation="Horizontal">
+                    <Button x:Name="AddStepImageButton"
+                            Content="➕ Добавить фото к шагу" 
+                            Height="35" 
+                            Width="170"
+                            Margin="0,5,10,10"
+                            HorizontalAlignment="Left"
+                            Background="LightBlue"
+                            Cursor="Hand" Click="AddStepImageButton_Click"/>
+
+                    <Button x:Name="AddStepButton"
+                            Content="➕ Добавить шаг" 
+                            Height="35" 
+                            Width="120"
+                            Margin="0,5,0,10"
+                            HorizontalAlignment="Left"
+                            Background="LightGreen"
+                            Cursor="Hand"
+                            Click="AddStepButton_Click"/>
+                </StackPanel>
+                
 
                 <ScrollViewer Height="200" VerticalScrollBarVisibility="Auto">
                     <ListBox x:Name="StepsListBox" 
-                             ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+                             ScrollViewer.VerticalScrollBarVisibility="Auto">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="LightGray" BorderThickness="1" 
+                                        CornerRadius="5" Margin="5" Padding="10">
+                                    <StackPanel>
+                                        <!-- Картинка шага -->
+                                        <Image Source="{Binding ImagePath}" 
+                                               MaxWidth="200" 
+                                               MaxHeight="200"
+                                               Margin="0,5"/>
+                                        <!-- Текст шага -->
+                                        <TextBlock Text="{Binding Description}"
+                                                TextWrapping="Wrap"
+                                                MinHeight="50"
+                                                Margin="0,0,0,10"/>
+                                        
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+
+                        <ListBox.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="🗑 Удалить выбранный шаг" Click="DeleteSelectedStep_Click"/>
+                            </ContextMenu>
+                        </ListBox.ContextMenu>
+                    </ListBox>
                 </ScrollViewer>
             </StackPanel>
 

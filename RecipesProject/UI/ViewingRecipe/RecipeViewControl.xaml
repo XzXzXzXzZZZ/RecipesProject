@@ -69,6 +69,8 @@
                     BorderBrush="#FFCCCCCC"
                     Click="IsFavoriteBtn_Click"/>
 
+            <Image x:Name="ViewImage" Grid.Row="1"/>
+
             <!-- Название-->
             <Label x:Name="NameRecipe" 
                    Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"

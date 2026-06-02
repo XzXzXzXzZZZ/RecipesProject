@@ -27,41 +27,7 @@ namespace RecipesProject.UI.AllRecepts
             try
             {
                 _dbContext = new DBContext();
-                _dbContext.Database.EnsureCreated();
                 _repository = new RecipeRepository(_dbContext);
-
-                if (!_dbContext.Recipes.Any())
-                {
-                    _repository.Add(new Recipe
-                    {
-                        Title = "Борщ",
-                        Description = "Традиционный украинский борщ",
-                        CookingTime = 90,
-                        Servings = 4,
-                        Difficulty = 3,
-                        IsFavorite = 1
-                    });
-
-                    _repository.Add(new Recipe
-                    {
-                        Title = "Оливье",
-                        Description = "Классический новогодний салат",
-                        CookingTime = 60,
-                        Servings = 6,
-                        Difficulty = 2,
-                        IsFavorite = 1
-                    });
-
-                    _repository.Add(new Recipe
-                    {
-                        Title = "Блинчики",
-                        Description = "Тонкие блинчики на молоке",
-                        CookingTime = 30,
-                        Servings = 2,
-                        Difficulty = 1
-                    });
-                }
-
                 LoadAllRecipes();
             }
             catch (Exception ex)

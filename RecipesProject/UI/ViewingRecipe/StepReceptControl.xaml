@@ -12,6 +12,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <Label x:Name="NumberStep"  
@@ -23,8 +24,10 @@
                    Padding="0"
                    Margin="0,0,0,8"/>
 
+            <Image x:Name="ViewImage" Grid.Row="1"/>
+
             <TextBlock x:Name="DescriptionStep" 
-                       Grid.Row="1"
+                       Grid.Row="2"
                        Text="Описание"
                        TextWrapping="Wrap"
                        FontSize="16"

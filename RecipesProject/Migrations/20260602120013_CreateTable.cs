@@ -5,7 +5,7 @@
 namespace RecipesProject.Migrations
 {
     /// <inheritdoc />
-    public partial class CreateTables : Migration
+    public partial class CreateTable : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -103,7 +103,8 @@ namespace RecipesProject.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Ingredients_RecipeId",
                 table: "Ingredients",
-                column: "RecipeId");
+                column: "RecipeId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_MyProducts_Name",

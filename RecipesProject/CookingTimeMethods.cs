@@ -59,6 +59,23 @@ namespace RecipesProject
             return (hour, minute);
         }
 
+        //-- Конвертация минут в часы и минуты
+        public static (int hour, int minute) ConvertingTimeMinute(int minute)
+        {
+            int hour = 0;
+            int min = 0;
+
+            if (minute>0)
+            {
+                if(minute >= 60)
+                    hour = minute / 60;
+
+                if (minute % 60 != 0)
+                    min = minute % 60;
+            }
+            return (hour, min);
+        }
+
         //-- Конвертация строки по типу [число]ч [число]м в количество минут
         public static int ConvertingTimeFromStringToMinutes(string CookingTime)
         {

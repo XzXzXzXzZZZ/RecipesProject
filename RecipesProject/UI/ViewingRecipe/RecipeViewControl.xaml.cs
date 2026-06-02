@@ -1,8 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RecipesProject.Data;
 using RecipesProject.Models;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
 
 
 namespace RecipesProject.UI.ViewingRecipe
@@ -26,6 +29,10 @@ namespace RecipesProject.UI.ViewingRecipe
 
             if (recipe != null)
             {
+                //-- Подгрузка фото
+                ViewImage.Source = ImageMethods.readImage(recipe.MainPhotoPath);
+
+
                 //-- Подгрузка названия
                 NameRecipe.Content = recipe.Title;
 
@@ -42,7 +49,7 @@ namespace RecipesProject.UI.ViewingRecipe
                 }
 
                 //-- Подгрузка ингридиентов
-                IngredientRecipe.Text +='\n' + String.Join('\n', recipe.Ingredients.Select(i=>i.Text).ToList());
+                IngredientRecipe.Text += "\n" + recipe.Ingredient.Text;
 
                 //-- Подгрузка сложности
                 if (recipe.Difficulty != null)
@@ -116,6 +123,25 @@ namespace RecipesProject.UI.ViewingRecipe
                     btn.Content = "В избранное";
                 }
             }
+        }
+
+        public void Cleanup()
+        {
+            // Освобождаем главное фото
+            ViewImage.Source = null;
+
+            // Очищаем фото в шагах
+            foreach (var child in gridView.Children)
+            {
+                if (child is UserControl userControl && userControl.Content is StepReceptControl stepControl)
+                {
+                    stepControl.Cleanup();
+                }
+            }
+
+            // Очищаем все дочерние элементы грида
+            gridView.Children.Clear();
+            gridView.RowDefinitions.Clear();
         }
     }
 }

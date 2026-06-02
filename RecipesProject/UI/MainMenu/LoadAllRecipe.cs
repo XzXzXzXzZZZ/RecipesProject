@@ -54,22 +54,23 @@ namespace RecipesProject.UI.MainMenu
         {
             if (idRecipe != null)
             {
+                //-- Очищаем старый контрол и освобождаем ресурсы
+                if (MainContentControl.Content is RecipeViewControl oldView)
+                {
+                    oldView.Cleanup();
+                                                     
+                    //-- Вызываем сборщик мусора принудительно
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                }
+
                 using (DBContext dBContext = new DBContext())
                 {
                     RecipeRepository recipeRepository = new RecipeRepository(dBContext);
                     var recipe = recipeRepository.GetById((int)idRecipe);
-
-                    //-- Очищаем временное хранилище и заполняем данными рецепта, который обновляем
-                    TemporarySavingRecipe.Clear();
-                    TemporarySavingRecipe.Id = (int)idRecipe;
-                    TemporarySavingRecipe.Title = recipe.Title;
-                    TemporarySavingRecipe.CookingTime = CookingTimeMethods.ConvertingFromMinutesToString(recipe.CookingTime);
-                    TemporarySavingRecipe.IngredientsText += '\n' + String.Join('\n', recipe.Ingredients.Select(i => i.Text).ToList());
-                    TemporarySavingRecipe.Steps = recipe.Steps.Select(i => i.Description).ToList();
+                    MainContentControl.Content = new NewReceptControl(recipe);
+                    ShowNewReceptButtons();
                 }
-
-                MainContentControl.Content = new NewReceptControl();
-                ShowNewReceptButtons();
             }
         }
 

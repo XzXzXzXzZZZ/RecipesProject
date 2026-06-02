@@ -20,6 +20,6 @@ namespace RecipesProject.Models
         public string? UpdatedAt {  get; set; }
 
         public ICollection<Step> Steps = new List<Step>();
-        public ICollection<Ingredient> Ingredients = new List<Ingredient>();
+        public Ingredient Ingredient;
     }
 }

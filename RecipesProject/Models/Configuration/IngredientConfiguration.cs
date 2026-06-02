@@ -15,8 +15,8 @@ namespace RecipesProject.Models.Configuration
             builder.HasKey(i => i.Id);
 
             builder.HasOne(i=>i.Recipe)
-                .WithMany(i => i.Ingredients)
-                .HasForeignKey(i=>i.RecipeId)
+                .WithOne(i => i.Ingredient)
+                .HasForeignKey<Ingredient>(i=>i.RecipeId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

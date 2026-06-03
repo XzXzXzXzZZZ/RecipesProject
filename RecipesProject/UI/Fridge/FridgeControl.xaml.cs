@@ -187,7 +187,7 @@ namespace RecipesProject.UI.Fridge
             Button btn = sender as Button;
             if (btn != null && btn.Tag is string ingredient)
             {
-                if (MessageBox.Show($"Удалить базовый продукт '{ingredient}'?", "Подтверждение",
+                if (MessageBox.Show($"Удалить базовый ингредиент '{ingredient}'?", "Подтверждение",
                     MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
                     baseIngredients.Remove(ingredient);
@@ -311,19 +311,19 @@ namespace RecipesProject.UI.Fridge
 
             EmptyConstantText.Visibility = Visibility.Collapsed;
 
-            foreach (var product in constantProducts)
+            foreach (var ingredient_const in constantProducts)
             {
                 StackPanel panel = new StackPanel { Orientation = Orientation.Horizontal };
 
-                Border productBorder = new Border
+                Border ingredient_const_Border = new Border
                 {
                     Style = (Style)FindResource("ProductItemStyle"),
-                    Tag = product
+                    Tag = ingredient_const
                 };
 
-                TextBlock productText = new TextBlock
+                TextBlock ingredient_const_Text = new TextBlock
                 {
-                    Text = product,
+                    Text = ingredient_const,
                     FontSize = 14,
                     VerticalAlignment = VerticalAlignment.Center
                 };
@@ -336,29 +336,29 @@ namespace RecipesProject.UI.Fridge
                     Margin = new Thickness(10, 0, 0, 0),
                     FontSize = 12,
                     Cursor = System.Windows.Input.Cursors.Hand,
-                    Tag = product,
+                    Tag = ingredient_const,
                     Background = Brushes.Transparent,
                     BorderThickness = new Thickness(0),
                     Foreground = Brushes.Gray
                 };
                 deleteBtn.Click += DeleteConstantProduct_Click;
 
-                panel.Children.Add(productText);
+                panel.Children.Add(ingredient_const_Text);
                 panel.Children.Add(deleteBtn);
-                productBorder.Child = panel;
-                ConstantProductsPanel.Children.Add(productBorder);
+                ingredient_const_Border.Child = panel;
+                ConstantProductsPanel.Children.Add(ingredient_const_Border);
             }
         }
 
         private void DeleteConstantProduct_Click(object sender, RoutedEventArgs e)
         {
             Button btn = sender as Button;
-            if (btn != null && btn.Tag is string product)
+            if (btn != null && btn.Tag is string ingredient_const)
             {
-                if (MessageBox.Show($"Удалить постоянный продукт '{product}'?", "Подтверждение",
+                if (MessageBox.Show($"Удалить постоянный ингредиент '{ingredient_const}'?", "Подтверждение",
                     MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
-                    constantProducts.Remove(product);
+                    constantProducts.Remove(ingredient_const);
                     UpdateConstantProductsDisplay();
                 }
             }
@@ -373,15 +373,15 @@ namespace RecipesProject.UI.Fridge
 
         private void ConfirmAddBtn_Click(object sender, RoutedEventArgs e)
         {
-            string productName = NewProductNameTextBox.Text.Trim();
-            if (string.IsNullOrWhiteSpace(productName))
+            string ingredient_const_Name = NewProductNameTextBox.Text.Trim();
+            if (string.IsNullOrWhiteSpace(ingredient_const_Name))
             {
-                MessageBox.Show("Введите название продукта", "Предупреждение",
+                MessageBox.Show("Введите название ингредиента", "Предупреждение",
                     MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            constantProducts.Add(productName);
+            constantProducts.Add(ingredient_const_Name);
             AddProductPanel.Visibility = Visibility.Collapsed;
             UpdateConstantProductsDisplay();
         }

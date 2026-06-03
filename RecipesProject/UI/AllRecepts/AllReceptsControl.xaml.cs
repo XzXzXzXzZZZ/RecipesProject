@@ -120,7 +120,7 @@ namespace RecipesProject.UI.AllRecepts
                 // Время
                 var time = new TextBlock
                 {
-                    Text = $"⏱️ {recipe.CookingTime} мин",
+                    Text = $" ⏱️ {recipe.CookingTime} мин",
                     FontSize = 12,
                     Foreground = Brushes.Gray,
                     VerticalAlignment = VerticalAlignment.Center

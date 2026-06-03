@@ -20,8 +20,36 @@ namespace RecipesProject.UI.ViewingRecipe
             DBContext dbContext = new DBContext();
             recipeRepository = new RecipeRepository(dbContext);
             recipe = recipeRepository.GetById(id);
-
             loadInfoRecipe();
+        }
+        // метод для Цдаления рецептов (предупреждение)
+        private void DeleteRecipeBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (recipe != null)
+            {
+                if (MessageBox.Show($"Вы уверены, что хотите удалить рецепт \"{recipe.Title}\"?",
+                    "Подтверждение удаления", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                {
+                    try
+                    {
+                        recipeRepository.Delete(recipe.Id);
+                        MessageBox.Show($"Рецепт \"{recipe.Title}\" успешно удалён!", "Успех",
+                            MessageBoxButton.OK, MessageBoxImage.Information);
+
+                        // Возвращаемся на главный экран
+                        var windowMain = Application.Current.MainWindow as MainMenu.WindowMain;
+                        if (windowMain != null)
+                        {
+                            windowMain.loadMainMenu();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Ошибка при удалении: {ex.Message}", "Ошибка",
+                            MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            }
         }
 
         void loadInfoRecipe()

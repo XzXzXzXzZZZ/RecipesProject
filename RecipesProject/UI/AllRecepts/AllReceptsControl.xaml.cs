@@ -15,6 +15,7 @@ namespace RecipesProject.UI.AllRecepts
         private DBContext _dbContext;
 
         public event EventHandler<int> RecipeSelected;
+        public event EventHandler<int> RecipeDeleted;
 
         public AllReceptsControl()
         {
@@ -81,13 +82,13 @@ namespace RecipesProject.UI.AllRecepts
 
             foreach (var recipe in recipes)
             {
-                
                 var border = new Border
                 {
                     Background = Brushes.White,
                     CornerRadius = new CornerRadius(8),
                     Padding = new Thickness(15),
-                    Margin = new Thickness(0, 0, 0, 5)
+                    Margin = new Thickness(0, 0, 0, 5),
+                    Tag = recipe.Id
                 };
 
                 var grid = new Grid();
@@ -129,6 +130,33 @@ namespace RecipesProject.UI.AllRecepts
                 grid.Children.Add(time);
 
                 border.Child = grid;
+                border.MouseRightButtonDown += (s, e) =>
+                {
+                    var contextMenu = new ContextMenu();
+                    var deleteItem = new MenuItem { Header = "🗑 Удалить рецепт" };
+                    deleteItem.Click += (sender, args) =>
+                    {
+                        if (MessageBox.Show($"Вы уверены, что хотите удалить рецепт \"{recipe.Title}\"?",
+                            "Подтверждение удаления", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                        {
+                            try
+                            {
+                                _repository.Delete(recipe.Id);
+                                RecipeDeleted?.Invoke(this, recipe.Id);
+                                LoadAllRecipes();
+                                MessageBox.Show($"Рецепт \"{recipe.Title}\" успешно удалён!", "Успех",
+                                    MessageBoxButton.OK, MessageBoxImage.Information);
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show($"Ошибка при удалении: {ex.Message}", "Ошибка",
+                                    MessageBoxButton.OK, MessageBoxImage.Error);
+                            }
+                        }
+                    };
+                    contextMenu.Items.Add(deleteItem);
+                    border.ContextMenu = contextMenu;
+                };
 
                 var item = new ListBoxItem
                 {
@@ -141,13 +169,11 @@ namespace RecipesProject.UI.AllRecepts
             }
         }
 
-        //-- Обработчик нажатия на элемент ListBox
         private void ReceptsListBox_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             var selectedItem = ReceptsListBox.SelectedItem as ListBoxItem;
             if (selectedItem?.Tag != null)
             {
-                //-- Вызываем событие, чтобы главное окно знало о выборе
                 if (int.TryParse(selectedItem.Tag.ToString(), out int recipeId))
                 {
                     RecipeSelected?.Invoke(this, recipeId);

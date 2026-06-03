@@ -35,7 +35,7 @@ namespace RecipesProject.UI.MainMenu
             ShowViewReceptButtons();
         }
 
-        //-- Кнопки после выбора рецепта
+        // Три кнопки меню после выбора рецепта (снизу)
         private void ShowViewReceptButtons()
         {
             ButtonsPanel.Children.Clear();
@@ -43,23 +43,27 @@ namespace RecipesProject.UI.MainMenu
 
             var backBtn = CreateButton("Вернуться на главный экран", "Back", 220);
             backBtn.Click += MainMenuBTN_Click;
+
             var updateBtn = CreateButton("Изменить рецепт", "Update", 220);
             updateBtn.Click += UpdateBTN_Click;
 
+            var deleteBtn = CreateButton("Удалить рецепт", "Delete", 220);
+            deleteBtn.Click += DeleteRecipeBtn_Click;
+
             ButtonsPanel.Children.Add(backBtn);
             ButtonsPanel.Children.Add(updateBtn);
+            ButtonsPanel.Children.Add(deleteBtn);
         }
 
         private void UpdateBTN_Click(object sender, RoutedEventArgs e)
         {
             if (idRecipe != null)
             {
-                //-- Очищаем старый контрол и освобождаем ресурсы
+                //очищение старого контрола
                 if (MainContentControl.Content is RecipeViewControl oldView)
                 {
                     oldView.Cleanup();
-                                                     
-                    //-- Вызываем сборщик мусора принудительно
+                    //сборщк мусора
                     GC.Collect();
                     GC.WaitForPendingFinalizers();
                 }
@@ -74,5 +78,43 @@ namespace RecipesProject.UI.MainMenu
             }
         }
 
+        //Обработчик удаления рецепта
+        private void DeleteRecipeBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (idRecipe != null)
+            {
+                // получение названия рецепта для последующего его вывода в консоли
+                string recipeTitle = "";
+                using (DBContext dBContext = new DBContext())
+                {
+                    RecipeRepository recipeRepository = new RecipeRepository(dBContext);
+                    var recipe = recipeRepository.GetById((int)idRecipe);
+                    if (recipe != null)
+                    {
+                        recipeTitle = recipe.Title;
+                    }
+                }
+
+                if (MessageBox.Show($"Вы уверены, что хотите удалить рецепт \"{recipeTitle}\"?",
+                    "Подтверждение удаления", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                {
+                    try
+                    {
+                        using (DBContext dBContext = new DBContext())
+                        {
+                            RecipeRepository recipeRepository = new RecipeRepository(dBContext);
+                            recipeRepository.Delete((int)idRecipe);
+                        }
+                        // Возвращение к глав экрану
+                        loadMainMenu();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Ошибка при удалении: {ex.Message}", "Ошибка",
+                            MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            }
+        }
     }
 }

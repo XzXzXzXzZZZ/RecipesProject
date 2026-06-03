@@ -15,6 +15,7 @@ namespace RecipesProject.UI.FavRecepts
         private DBContext _dbContext;
 
         public event EventHandler<int> RecipeSelected;
+        public event EventHandler<int> RecipeDeleted;
 
         public FavReceptsControl()
         {
@@ -56,7 +57,7 @@ namespace RecipesProject.UI.FavRecepts
             }
 
             var filteredRecipes = _repository.SearchByTitle(query);
-            var filteredRecipesIsFavorite = filteredRecipes.Where(r=>r.IsFavorite == 1).ToList();
+            var filteredRecipesIsFavorite = filteredRecipes.Where(r => r.IsFavorite == 1).ToList();
             UpdateListBox(filteredRecipesIsFavorite);
         }
 
@@ -83,13 +84,13 @@ namespace RecipesProject.UI.FavRecepts
 
             foreach (var recipe in recipes)
             {
-                // Карточка рецепта
                 var border = new Border
                 {
                     Background = Brushes.White,
                     CornerRadius = new CornerRadius(8),
                     Padding = new Thickness(15),
-                    Margin = new Thickness(0, 0, 0, 5)
+                    Margin = new Thickness(0, 0, 0, 5),
+                    Tag = recipe.Id
                 };
 
                 var grid = new Grid();
@@ -97,7 +98,6 @@ namespace RecipesProject.UI.FavRecepts
                 grid.ColumnDefinitions.Add(new ColumnDefinition());
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
-                // Иконка
                 var icon = new TextBlock
                 {
                     Text = "❤️",
@@ -107,7 +107,6 @@ namespace RecipesProject.UI.FavRecepts
                 Grid.SetColumn(icon, 0);
                 grid.Children.Add(icon);
 
-                // Название
                 var title = new TextBlock
                 {
                     Text = recipe.Title,
@@ -119,10 +118,9 @@ namespace RecipesProject.UI.FavRecepts
                 Grid.SetColumn(title, 1);
                 grid.Children.Add(title);
 
-                // Время
                 var time = new TextBlock
                 {
-                    Text = $" {recipe.CookingTime} мин",
+                    Text = $" ⏱️ {recipe.CookingTime} мин",
                     FontSize = 12,
                     Foreground = Brushes.Gray,
                     VerticalAlignment = VerticalAlignment.Center
@@ -131,6 +129,33 @@ namespace RecipesProject.UI.FavRecepts
                 grid.Children.Add(time);
 
                 border.Child = grid;
+                border.MouseRightButtonDown += (s, e) =>
+                {
+                    var contextMenu = new ContextMenu();
+                    var deleteItem = new MenuItem { Header = "🗑 Удалить рецепт" };
+                    deleteItem.Click += (sender, args) =>
+                    {
+                        if (MessageBox.Show($"Вы уверены, что хотите удалить рецепт \"{recipe.Title}\"?",
+                            "Подтверждение удаления", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                        {
+                            try
+                            {
+                                _repository.Delete(recipe.Id);
+                                RecipeDeleted?.Invoke(this, recipe.Id);
+                                LoadFavorites();
+                                MessageBox.Show($"Рецепт \"{recipe.Title}\" успешно удалён!", "Успех",
+                                    MessageBoxButton.OK, MessageBoxImage.Information);
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show($"Ошибка при удалении: {ex.Message}", "Ошибка",
+                                    MessageBoxButton.OK, MessageBoxImage.Error);
+                            }
+                        }
+                    };
+                    contextMenu.Items.Add(deleteItem);
+                    border.ContextMenu = contextMenu;
+                };
 
                 var item = new ListBoxItem
                 {

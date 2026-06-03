@@ -36,19 +36,17 @@ namespace RecipesProject.Data
 
             if (isPermanent)
             {
-                if (_context.PermanentProducts.Any(p => p.Name.ToLower() == nameLower))
+                if (!_context.MyProducts.Any(p => p.Name.ToLower() == nameLower) && !_context.PermanentProducts.Any(p => p.Name.ToLower() == nameLower))
                 {
-                    throw new InvalidOperationException($"Постоянный продукт '{name}' уже существует!");
+                    _context.PermanentProducts.Add(new PermanentProduct { Name = name });
                 }
-                _context.PermanentProducts.Add(new PermanentProduct { Name = name });
             }
             else
             {
-                if (_context.MyProducts.Any(p => p.Name.ToLower() == nameLower))
+                if (!_context.MyProducts.Any(p => p.Name.ToLower() == nameLower) && !_context.PermanentProducts.Any(p => p.Name.ToLower() == nameLower))
                 {
-                    throw new InvalidOperationException($"Временный продукт '{name}' уже есть!");
+                    _context.MyProducts.Add(new MyProduct { Name = name });
                 }
-                _context.MyProducts.Add(new MyProduct { Name = name });
             }
 
             _context.SaveChanges();

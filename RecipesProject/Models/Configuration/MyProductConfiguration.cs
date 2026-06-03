@@ -16,9 +16,6 @@ namespace RecipesProject.Models.Configuration
 
             builder.HasIndex(p => p.Name)
                 .IsUnique();
-
-            builder.Property(p=>p.IsPermanent)
-                .HasDefaultValue(0);
         }
     }
 }

@@ -180,7 +180,7 @@
                        HorizontalAlignment="Center"/>
 
             <!-- подсказка-->
-            <TextBlock Grid.Row="1"
+            <TextBlock x:Name="TextHint" Grid.Row="1"
                        Text="Нажмите на ингредиенты, которые есть у вас в холодильнике"
                        FontSize="14"
                        Foreground="Gray"
@@ -216,9 +216,17 @@
                                 Click="AddBaseIngredientBtn_Click"/>
                     </StackPanel>
 
-                    <WrapPanel Grid.Row="1" 
-                               x:Name="IngredientsPanel"
-                               HorizontalAlignment="Center"/>
+                    <StackPanel Grid.Row="1">
+                        <WrapPanel x:Name="IngredientsPanel"/>
+
+                        <TextBlock x:Name="EmptyBaseText"
+                                   Text="Нет базовых продуктов. Нажмите 'Добавить'"
+                                   FontSize="14"
+                                   Foreground="Gray"
+                                   Margin="5"
+                                   Visibility="Visible"/>
+                    </StackPanel>
+
 
                     <!-- Панель для добавления базового ингредиента -->
                     <Border x:Name="AddBaseIngredientPanel"
@@ -313,14 +321,16 @@
                                 Click="AddProductBtn_Click"/>
                     </StackPanel>
 
-                    <WrapPanel x:Name="ConstantProductsPanel" Grid.Row="1">
+                    <StackPanel Grid.Row="1">
+                        <WrapPanel x:Name="ConstantProductsPanel"/>
                         <TextBlock x:Name="EmptyConstantText"
                                    Text="Нет постоянных продуктов. Нажмите 'Добавить'"
                                    FontSize="14"
                                    Foreground="Gray"
                                    Margin="5"
                                    Visibility="Visible"/>
-                    </WrapPanel>
+                    </StackPanel>
+                    
 
                     <!-- Панель для добавления постоянного продукта -->
                     <Border x:Name="AddProductPanel"

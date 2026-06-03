@@ -7,6 +7,7 @@ using RecipesProject.UI.AllRecepts;
 using RecipesProject.UI.FavRecepts;   
 using RecipesProject.UI.NewRecepts;
 using RecipesProject.Models;
+using RecipesProject.Data;
 
 namespace RecipesProject.UI.MainMenu
 {
@@ -14,10 +15,55 @@ namespace RecipesProject.UI.MainMenu
     {
         public WindowMain()
         {
-            //using(DBContext dbContext = new DBContext())
-            //{
-            //    dbContext.Database.Migrate();
-            //}
+            try
+            {
+                using (DBContext dbContext = new DBContext())
+                {
+                    dbContext.Database.Migrate();
+                    string[] defaultIngredients = new string[]
+                    {
+                        "Огурцы",
+                        "Помидоры",
+                        "Яйца",
+                        "Сыр",
+                        "Мясо",
+                        "Рыба",
+                        "Курица",
+                        "Картошка",
+                        "Морковка",
+                        "Лук",
+                        "Чеснок",
+                        "Брокколи",
+                        "Грибы",
+                        "Рис",
+                        "Паста",
+                        "Молоко",
+                        "Масло",
+                        "Зелень",
+                        "Хлеб",
+                        "Мед",
+                        "Лимоны",
+                        "Апельсины",
+                        "Яблоки",
+                        "Бананы",
+                        "Клубника",
+                        "Киви",
+                        "Баклажаны",
+                        "Перцы",
+                        "Авокадо"
+                    };
+                    ProductRepository productRepository = new ProductRepository(dbContext);
+                    productRepository.SeedPermanentProducts();
+                    foreach (string productName in defaultIngredients)
+                    {
+                        productRepository.AddMyProduct(productName, false);
+                    }
+                }
+            }
+            catch(Exception e) { 
+                MessageBox.Show(e.ToString());
+            }
+            
             InitializeComponent();
             loadMainMenu();
         }

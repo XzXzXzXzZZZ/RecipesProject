@@ -11,7 +11,7 @@ using RecipesProject.Models;
 namespace RecipesProject.Migrations
 {
     [DbContext(typeof(DBContext))]
-    [Migration("20260602120013_CreateTable")]
+    [Migration("20260603172958_CreateTable")]
     partial class CreateTable
     {
         /// <inheritdoc />
@@ -54,11 +54,6 @@ namespace RecipesProject.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("IsPermanent")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(0);
 
                     b.Property<string>("Name")
                         .IsRequired()

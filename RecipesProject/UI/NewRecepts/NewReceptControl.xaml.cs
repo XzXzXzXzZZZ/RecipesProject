@@ -1,35 +1,32 @@
-﻿using Microsoft.VisualBasic;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using RecipesProject.Models;
 using RecipesProject.UI.MainMenu;
-using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 namespace RecipesProject.UI.NewRecepts
 {
     public partial class NewReceptControl : UserControl
     {
         Recipe? recipe = null;
+
         public NewReceptControl(Recipe? recipe)
         {
             InitializeComponent();
             this.recipe = recipe;
             LoadDataFromTemporarySaving();
-
-            if (SearchIngredientTextBox != null)
-            {
-                SearchIngredientTextBox.Text = "Какой ингредиент вы ищете?";
-                SearchIngredientTextBox.Foreground = Brushes.Gray;
-            }
+            InitSearchBox();
         }
 
         public NewReceptControl()
         {
             InitializeComponent();
+            InitSearchBox();
+        }
 
+        void InitSearchBox()
+        {
             if (SearchIngredientTextBox != null)
             {
                 SearchIngredientTextBox.Text = "Какой ингредиент вы ищете?";
@@ -37,27 +34,24 @@ namespace RecipesProject.UI.NewRecepts
             }
         }
 
-        //-- Подгружаем данные
+        //Подгружаем данные
         void LoadDataFromTemporarySaving()
         {
-            if(recipe != null)
-            {
-                NameTextBox.Text = (!String.IsNullOrEmpty(recipe.Title) ?
-               recipe.Title : "");
+            if (recipe == null) return;
 
-                ViewImage.Source = ImageMethods.readImage(recipe.MainPhotoPath);
+            NameTextBox.Text = recipe.Title ?? "";
+            ViewImage.Source = ImageMethods.readImage(recipe.MainPhotoPath);
+            DescriptionTextBox.Text = recipe.Description ?? "";
 
-                DescriptionTextBox.Text = (!String.IsNullOrEmpty(recipe.Description) ?
-                   recipe.Description : "");
+            if (recipe.Difficulty >= 0 && recipe.Difficulty <= 5)
+                DifficultyIntegerUpDown.Value = recipe.Difficulty;
 
-                if (0 <= recipe.Difficulty && recipe.Difficulty <= 5)
-                    DifficultyIntegerUpDown.Value = recipe.Difficulty;
+            if (recipe.Servings >= 1 && recipe.Servings <= 100)
+                ServingsIntegerUpDown.Value = recipe.Servings;
 
-                if (1 <= recipe.Servings && recipe.Servings <= 100)
-                    ServingsIntegerUpDown.Value = recipe.Servings;
-
-                IngredientsTextBox.Text = (!String.IsNullOrEmpty(recipe.Ingredient.Text) ? recipe.Ingredient.Text : "");
-            }
+            // Ингредиенты как коллекция 
+            if (recipe.Ingredient != null && recipe.Ingredient.Count > 0)
+                IngredientsTextBox.Text = string.Join("\n", recipe.Ingredient.Select(i => i.Text));
         }
 
         private void SearchIngredientTextBox_GotFocus(object sender, RoutedEventArgs e)
@@ -81,7 +75,6 @@ namespace RecipesProject.UI.NewRecepts
         // Переход к созданию шагов
         private void GoToStepsButton_Click(object sender, RoutedEventArgs e)
         {
-            //Проверки
             if (string.IsNullOrWhiteSpace(NameTextBox.Text))
             {
                 MessageBox.Show("Пожалуйста, введите название рецепта", "Предупреждение",
@@ -101,17 +94,21 @@ namespace RecipesProject.UI.NewRecepts
             var parent = this.Parent as ContentControl;
             if (parent != null)
             {
-                //-- Перед переходом в другой контроллер сохраняем данные
-                if(recipe == null)
-                {
+                if (recipe == null)
                     recipe = new Recipe();
-                }
 
                 recipe.Title = NameTextBox.Text;
                 recipe.Description = DescriptionTextBox.Text;
                 recipe.Difficulty = DifficultyIntegerUpDown.Value;
                 recipe.Servings = ServingsIntegerUpDown.Value;
-                recipe.Ingredient = new Ingredient() {Text = IngredientsTextBox.Text, Recipe = recipe };
+
+                // Ингредиенты — создаём список из строк
+                var lines = IngredientsTextBox.Text.Split('\n', '\r')
+                    .Where(l => !string.IsNullOrWhiteSpace(l));
+                var list = new List<Ingredient>();
+                foreach (var line in lines)
+                    list.Add(new Ingredient { Text = line.Trim(), Recipe = recipe });
+                recipe.Ingredient = list;
 
                 ViewImage.Source = null;
 
@@ -121,15 +118,10 @@ namespace RecipesProject.UI.NewRecepts
             }
         }
 
-        //-- При вызове события сохранения - переходим в главное меню
         private void ReturnToMainScreen()
         {
-            //-- Возвращаемся на главный экран
-            var windowMain = Application.Current.MainWindow as WindowMain;
-            if (windowMain != null)
-            {
-                windowMain.loadMainMenu();
-            }
+            if (Application.Current.MainWindow is WindowMain wm)
+                wm.loadMainMenu();
         }
 
         private void AddImage_Click(object sender, RoutedEventArgs e)
@@ -143,18 +135,11 @@ namespace RecipesProject.UI.NewRecepts
 
             if (openFileDialog.ShowDialog() == true)
             {
-                string filePath = openFileDialog.FileName;
-
-                //-- Подгрузка фото
-                ViewImage.Source = ImageMethods.readImage(filePath); ;
-
+                ViewImage.Source = ImageMethods.readImage(openFileDialog.FileName);
                 if (recipe == null)
-                {
                     recipe = new Recipe();
-                }
-                recipe.MainPhotoPath = filePath;
+                recipe.MainPhotoPath = openFileDialog.FileName;
             }
-
         }
     }
 }

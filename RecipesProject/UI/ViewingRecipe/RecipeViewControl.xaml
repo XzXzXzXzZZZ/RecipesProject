@@ -55,19 +55,31 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!-- Кнопка "избранное" -->
-            <Button x:Name="IsFavoriteBtn" 
-                    Grid.Row="0" Grid.Column="2" 
-                    Width="140" Height="35"
-                    Margin="0,0,0,10"
-                    HorizontalAlignment="Right"
-                    Background="#FFE0E0E0"
-                    Foreground="#FF333333"
-                    FontSize="14"
-                    Cursor="Hand"
-                    BorderThickness="1"
-                    BorderBrush="#FFCCCCCC"
-                    Click="IsFavoriteBtn_Click"/>
+            <!-- Кнопки -->
+            <StackPanel Grid.Row="0" Grid.Column="2" 
+                        HorizontalAlignment="Right" 
+                        Orientation="Horizontal"
+                        Margin="0,0,0,10">
+                <Button x:Name="SavePdfBtn" 
+                        Content="📄 Сохранить PDF"
+                        Width="140" Height="35"
+                        Margin="0,0,5,0"
+                        Background="IndianRed"
+                        Foreground="White"
+                        FontSize="14"
+                        Cursor="Hand"
+                        BorderThickness="0"
+                        Click="SavePdfBtn_Click"/>
+                <Button x:Name="IsFavoriteBtn" 
+                        Width="140" Height="35"
+                        Background="#FFE0E0E0"
+                        Foreground="#FF333333"
+                        FontSize="14"
+                        Cursor="Hand"
+                        BorderThickness="1"
+                        BorderBrush="#FFCCCCCC"
+                        Click="IsFavoriteBtn_Click"/>
+            </StackPanel>
 
             <Image x:Name="ViewImage" Grid.Row="1"/>
 
@@ -82,7 +94,7 @@
                    HorizontalContentAlignment="Center"
                    Margin="0,10,0,15"/>
 
-            <!-- Строка с информацией (сложность, время готовки, колво порций) -->
+            <!-- Строка с информацией -->
             <WrapPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" 
                        Margin="0,0,0,15"
                        HorizontalAlignment="Center">
@@ -135,8 +147,6 @@
                                Foreground="#FF444444"/>
                 </Border>
             </StackPanel>
-
-            <!-- тут будут шаги (потом)((когда-нибудь)) -->
         </Grid>
     </ScrollViewer>
 </UserControl>

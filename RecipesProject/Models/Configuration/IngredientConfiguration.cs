@@ -1,10 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RecipesProject.Models.Configuration
 {
@@ -14,9 +9,9 @@ namespace RecipesProject.Models.Configuration
         {
             builder.HasKey(i => i.Id);
 
-            builder.HasOne(i=>i.Recipe)
-                .WithOne(i => i.Ingredient)
-                .HasForeignKey<Ingredient>(i=>i.RecipeId)
+            builder.HasOne(i => i.Recipe)
+                .WithMany(r => r.Ingredient)  // ← WithMany
+                .HasForeignKey(i => i.RecipeId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

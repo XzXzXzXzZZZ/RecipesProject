@@ -27,7 +27,7 @@ namespace RecipesProject.UI.MainMenu
         {
             ButtonsPanel.Children.Clear();
 
-            var favoriteBtn = CreateButton("❤ Любимое", "Favorite", 100);
+            var favoriteBtn = CreateButton("❤ Избранное", "Favorite", 100);
             var newReceptBtn = CreateButton("➕", "NewRecept", 100);
             var allReceptBtn = CreateButton("📖 Все рецепты", "AllRecepts", 120);
 

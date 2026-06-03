@@ -11,6 +11,9 @@ namespace RecipesProject.UI.Fridge
         // Коллекция выбранных ингредиентов
         private ObservableCollection<string> selectedIngredients = new ObservableCollection<string>();
 
+        // Коллекция постоянных продуктов
+        private ObservableCollection<ConstantProduct> constantProducts = new ObservableCollection<ConstantProduct>();
+
         // Список всех доступных ингредиентов
         private string[] allIngredients = new string[]
         {
@@ -36,10 +39,9 @@ namespace RecipesProject.UI.Fridge
             "Мед",
             "Лимоны",
             "Апельсины",
-            "ыыыыыаяустала",
             "Яблоки",
             "Бананы",
-            "Клубники",
+            "Клубника",
             "Киви",
             "Баклажаны",
             "Перцы",
@@ -47,15 +49,19 @@ namespace RecipesProject.UI.Fridge
         };
 
         // Параметры пагинации
-        private int itemsPerPage = 12; // Количество ингредиентов на одной странице
+        private int itemsPerPage = 12;
         private int currentPage = 0;
         private int totalPages = 0;
+
+        // Выбранный рецепт для удаления
+        private string selectedRecipeToDelete = null;
 
         public FridgeControl()
         {
             InitializeComponent();
             CalculateTotalPages();
             UpdateDisplay();
+            LoadConstantProducts();
         }
 
         private void CalculateTotalPages()
@@ -65,7 +71,6 @@ namespace RecipesProject.UI.Fridge
 
         private void UpdateDisplay()
         {
-            // ингредиенты для текуцш страницы
             var currentPageIngredients = allIngredients
                 .Skip(currentPage * itemsPerPage)
                 .Take(itemsPerPage)
@@ -155,7 +160,6 @@ namespace RecipesProject.UI.Fridge
                 {
                     selectedIngredients.Add(ingredient);
                 }
-
                 System.Diagnostics.Debug.WriteLine($"Выбран ингредиент: {ingredient}");
             }
         }
@@ -170,18 +174,164 @@ namespace RecipesProject.UI.Fridge
                 {
                     selectedIngredients.Remove(ingredient);
                 }
-
                 System.Diagnostics.Debug.WriteLine($"Снят ингредиент: {ingredient}");
             }
         }
 
-        //это надо для поиска рецептов (потом)
+        // ========== ПОСТОЯННЫЕ ПРОДУКТЫ ==========
+
+        private void LoadConstantProducts()
+        {
+            // Загрузка сохранённых постоянных продуктов (позже из БД)
+            // Пока пример:
+            constantProducts.Add(new ConstantProduct { Name = "Соль", IsPermanent = true });
+            constantProducts.Add(new ConstantProduct { Name = "Перец", IsPermanent = true });
+            constantProducts.Add(new ConstantProduct { Name = "Сахар", IsPermanent = true });
+            constantProducts.Add(new ConstantProduct { Name = "Масло растительное", IsPermanent = false });
+
+            UpdateConstantProductsDisplay();
+        }
+
+        private void UpdateConstantProductsDisplay()
+        {
+            ConstantProductsPanel.Children.Clear();
+
+            if (constantProducts.Count == 0)
+            {
+                EmptyConstantText.Visibility = Visibility.Visible;
+                return;
+            }
+
+            EmptyConstantText.Visibility = Visibility.Collapsed;
+
+            foreach (var product in constantProducts)
+            {
+                Border productBorder = new Border
+                {
+                    Background = product.IsPermanent ? (System.Windows.Media.Brush)new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(230, 245, 230)) : (System.Windows.Media.Brush)new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 240, 230)),
+                    BorderBrush = product.IsPermanent ? (System.Windows.Media.Brush)new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(200, 230, 200)) : (System.Windows.Media.Brush)new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(230, 200, 200)),
+                    BorderThickness = new Thickness(1),
+                    CornerRadius = new CornerRadius(5),
+                    Padding = new Thickness(10, 5, 10, 5),
+                    Margin = new Thickness(5)
+                };
+
+                StackPanel panel = new StackPanel { Orientation = Orientation.Horizontal };
+
+                TextBlock productText = new TextBlock
+                {
+                    Text = product.Name,
+                    FontSize = 14,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+
+                Button deleteBtn = new Button
+                {
+                    Content = "✖",
+                    Width = 25,
+                    Height = 25,
+                    Margin = new Thickness(10, 0, 0, 0),
+                    FontSize = 12,
+                    Cursor = System.Windows.Input.Cursors.Hand,
+                    Tag = product,
+                    Background = System.Windows.Media.Brushes.Transparent,
+                    BorderThickness = new Thickness(0),
+                    Foreground = System.Windows.Media.Brushes.Gray
+                };
+                deleteBtn.Click += DeleteConstantProduct_Click;
+
+                panel.Children.Add(productText);
+                panel.Children.Add(deleteBtn);
+                productBorder.Child = panel;
+                ConstantProductsPanel.Children.Add(productBorder);
+            }
+        }
+
+        private void DeleteConstantProduct_Click(object sender, RoutedEventArgs e)
+        {
+            Button btn = sender as Button;
+            if (btn != null && btn.Tag is ConstantProduct product)
+            {
+                if (MessageBox.Show($"Удалить продукт '{product.Name}'?", "Подтверждение",
+                    MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                {
+                    constantProducts.Remove(product);
+                    UpdateConstantProductsDisplay();
+                }
+            }
+        }
+
+        private void AddProductBtn_Click(object sender, RoutedEventArgs e)
+        {
+            AddProductPanel.Visibility = Visibility.Visible;
+            NewProductNameTextBox.Clear();
+            IsPermanentCheckBox.IsChecked = true;
+            NewProductNameTextBox.Focus();
+        }
+
+        private void ConfirmAddBtn_Click(object sender, RoutedEventArgs e)
+        {
+            string productName = NewProductNameTextBox.Text.Trim();
+            if (string.IsNullOrWhiteSpace(productName))
+            {
+                MessageBox.Show("Введите название продукта", "Предупреждение",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            constantProducts.Add(new ConstantProduct
+            {
+                Name = productName,
+                IsPermanent = IsPermanentCheckBox.IsChecked == true
+            });
+
+            AddProductPanel.Visibility = Visibility.Collapsed;
+            UpdateConstantProductsDisplay();
+        }
+
+        private void CancelAddBtn_Click(object sender, RoutedEventArgs e)
+        {
+            AddProductPanel.Visibility = Visibility.Collapsed;
+        }
+
+        // ========== УДАЛЕНИЕ РЕЦЕПТА ==========
+
+        private void DeleteRecipeBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (selectedRecipeToDelete != null)
+            {
+                if (MessageBox.Show($"Удалить рецепт '{selectedRecipeToDelete}'?", "Подтверждение",
+                    MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                {
+                    // TODO: Логика удаления рецепта из БД
+                    MessageBox.Show($"Рецепт '{selectedRecipeToDelete}' удалён", "Успех",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                    selectedRecipeToDelete = null;
+                    DeleteRecipeBtn.Visibility = Visibility.Collapsed;
+                }
+            }
+        }
+
+        // Метод для отображения кнопки удаления (вызывается при выборе рецепта)
+        public void ShowDeleteButton(string recipeName)
+        {
+            selectedRecipeToDelete = recipeName;
+            DeleteRecipeBtn.Visibility = Visibility.Visible;
+        }
+
+        public void HideDeleteButton()
+        {
+            selectedRecipeToDelete = null;
+            DeleteRecipeBtn.Visibility = Visibility.Collapsed;
+        }
+
+        // ========== ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ ==========
+
         public ObservableCollection<string> GetSelectedIngredients()
         {
             return selectedIngredients;
         }
 
-        //сброс тугл кнопок
         public void ClearAllSelections()
         {
             selectedIngredients.Clear();
@@ -194,5 +344,12 @@ namespace RecipesProject.UI.Fridge
                 }
             }
         }
+    }
+
+    // Класс для постоянного продукта
+    public class ConstantProduct
+    {
+        public string Name { get; set; }
+        public bool IsPermanent { get; set; }
     }
 }

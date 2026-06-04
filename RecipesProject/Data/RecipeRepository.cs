@@ -161,10 +161,11 @@ namespace RecipesProject.Data
                 return new List<Recipe>();
 
             return _context.Recipes
-                .Where(r => r.Title.Contains(query))
-                .Include(r => r.Steps)
-                .Include(r => r.Ingredients)
-                .ToList();
+        .Include(r => r.Steps)
+        .Include(r => r.Ingredients)
+        .ToList()
+        .Where(r => r.Title.ToLower().Contains(query.ToLower()))
+        .ToList();
         }
 
 

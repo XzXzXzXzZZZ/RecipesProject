@@ -1,3 +1,4 @@
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using RecipesProject.Data;
 using RecipesProject.Models;
@@ -7,18 +8,21 @@ namespace RecipeManager.Tests
     [TestFixture]
     public class Tests
     {
+        private SqliteConnection _connection;
         private DBContext _dBContext;
         private RecipeRepository _repo;
 
         [SetUp]
         public void Setup()
         {
+            _connection = new SqliteConnection("Data Source=:memory:");
+            _connection.Open();
+
             var options = new DbContextOptionsBuilder<DBContext>()
-                        .UseSqlServer("Data Source=HOME-PC\\MSSQLSERVER01;Initial Catalog=test;Integrated Security=True;Connect Timeout=30;Encrypt=True;Trust Server Certificate=True;Application Intent=ReadWrite;Multi Subnet Failover=False")
+                        .UseSqlite(_connection)
                         .Options;
 
             _dBContext = new DBContext(options);
-            _dBContext.Database.EnsureDeleted();
             _dBContext.Database.EnsureCreated();
             _repo = new RecipeRepository(_dBContext);
         }
@@ -99,6 +103,8 @@ namespace RecipeManager.Tests
         public void TearDown()
         {
             _dBContext?.Dispose();
+            _connection?.Close();
+            _connection?.Dispose();
         }
     }
 }

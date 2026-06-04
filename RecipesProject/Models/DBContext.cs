@@ -24,7 +24,7 @@ namespace RecipesProject.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Server=HOME-PC\\MSSQLSERVER01;Database=RecipesProject;Integrated Security=True;TrustServerCertificate=True");
+                optionsBuilder.UseSqlite("Data Source=recipes.db");
             }
         }
 

@@ -18,23 +18,11 @@ namespace RecipesProject.UI.NewRecepts
             InitializeComponent();
             this.recipe = recipe;
             LoadDataFromTemporarySaving();
-
-            if (SearchIngredientTextBox != null)
-            {
-                SearchIngredientTextBox.Text = "Какой ингредиент вы ищете?";
-                SearchIngredientTextBox.Foreground = Brushes.Gray;
-            }
         }
 
         public NewReceptControl()
         {
             InitializeComponent();
-
-            if (SearchIngredientTextBox != null)
-            {
-                SearchIngredientTextBox.Text = "Какой ингредиент вы ищете?";
-                SearchIngredientTextBox.Foreground = Brushes.Gray;
-            }
         }
 
         //-- Подгружаем данные
@@ -57,24 +45,6 @@ namespace RecipesProject.UI.NewRecepts
                     ServingsIntegerUpDown.Value = recipe.Servings;
 
                 IngredientsTextBox.Text = (!String.IsNullOrEmpty(recipe.Ingredient.Text) ? recipe.Ingredient.Text : "");
-            }
-        }
-
-        private void SearchIngredientTextBox_GotFocus(object sender, RoutedEventArgs e)
-        {
-            if (SearchIngredientTextBox.Text == "Какой ингредиент вы ищете?")
-            {
-                SearchIngredientTextBox.Text = "";
-                SearchIngredientTextBox.Foreground = Brushes.Black;
-            }
-        }
-
-        private void SearchIngredientTextBox_LostFocus(object sender, RoutedEventArgs e)
-        {
-            if (string.IsNullOrWhiteSpace(SearchIngredientTextBox.Text))
-            {
-                SearchIngredientTextBox.Text = "Какой ингредиент вы ищете?";
-                SearchIngredientTextBox.Foreground = Brushes.Gray;
             }
         }
 

@@ -5,7 +5,9 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
+using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
 namespace RecipesProject.UI.Fridge
 {
@@ -13,6 +15,8 @@ namespace RecipesProject.UI.Fridge
     {
         private readonly DBContext dBContext;
         private ProductRepository productRepository;
+
+        public event EventHandler<int> RecipeSelected;
 
         // Коллекция выбранных ингредиентов
         private ObservableCollection<IngredientItem> selectedIngredients = new ObservableCollection<IngredientItem>();
@@ -29,7 +33,7 @@ namespace RecipesProject.UI.Fridge
         private int totalPages = 0;
 
         // Выбранный рецепт для удаления
-        private string selectedRecipeToDelete = null;
+        private int selectedRecipeToDelete = 0;
 
         public FridgeControl()
         {
@@ -40,6 +44,8 @@ namespace RecipesProject.UI.Fridge
             CalculateTotalPages();
             UpdateDisplay();
             UpdateConstantProductsDisplay();
+
+            this.PreviewMouseDown += FridgeControl_MouseDown;
         }
 
         private void InitializeIngredients()
@@ -164,7 +170,7 @@ namespace RecipesProject.UI.Fridge
                 }
             }
             UpdatePaginationButtons();
-
+            UpdateRecipesContainer();
             PrevButton.IsEnabled = currentPage > 0;
             NextButton.IsEnabled = currentPage < totalPages - 1;
         }
@@ -193,7 +199,7 @@ namespace RecipesProject.UI.Fridge
                     button.Background = (Brush)new SolidColorBrush(Color.FromRgb(160, 160, 160));
                     button.Foreground = Brushes.White;
                 }
-
+                UpdateRecipesContainer();
                 System.Diagnostics.Debug.WriteLine($"Ингредиент: {ingredient.Name}, Выбрано: {IsIngredientSelected(ingredient)}");
             }
         }
@@ -208,9 +214,6 @@ namespace RecipesProject.UI.Fridge
                 {
                     baseIngredients.Remove(ingredient);
                     productRepository.RemoveMyProduct(ingredient.Id, false);
-                    var selected = selectedIngredients.FirstOrDefault(i => i.Id == ingredient.Id);
-                    if (selected != null)
-                        selectedIngredients.Remove(selected);
                     CalculateTotalPages();
                     if (currentPage >= totalPages && currentPage > 0)
                     {
@@ -360,6 +363,7 @@ namespace RecipesProject.UI.Fridge
                 panel.Children.Add(deleteBtn);
                 ingredient_const_Border.Child = panel;
                 ConstantProductsPanel.Children.Add(ingredient_const_Border);
+                UpdateRecipesContainer();
             }
         }
 
@@ -422,42 +426,221 @@ namespace RecipesProject.UI.Fridge
 
         private void DeleteRecipeBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (selectedRecipeToDelete != null)
+            if (selectedRecipeToDelete != 0)
             {
-                if (MessageBox.Show($"Удалить рецепт '{selectedRecipeToDelete}'?", "Подтверждение",
-                    MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                try 
                 {
-                    MessageBox.Show($"Рецепт '{selectedRecipeToDelete}' удалён", "Успех",
-                        MessageBoxButton.OK, MessageBoxImage.Information);
-                    selectedRecipeToDelete = null;
-                    DeleteRecipeBtn.Visibility = Visibility.Collapsed;
+                    RecipeRepository recipeRepository = new RecipeRepository(dBContext);
+                    var selectedRecipe = recipeRepository.GetById(selectedRecipeToDelete);
+                    if(selectedRecipe != null)
+                    {
+                        if (MessageBox.Show($"Удалить рецепт '{selectedRecipe.Title}'?", "Подтверждение",
+                            MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                        {
+                            recipeRepository.Delete(selectedRecipeToDelete);
+                            MessageBox.Show($"Рецепт '{selectedRecipe.Title}' удалён", "Успех",
+                                MessageBoxButton.OK, MessageBoxImage.Information);
+                            selectedRecipeToDelete = 0;
+                            DeleteRecipeBtn.Visibility = Visibility.Collapsed;
+                            UpdateRecipesContainer();
+                        }
+                    }
+                }
+                catch(Exception ex)
+                {
+                    MessageBox.Show($"Рецепт '{selectedRecipeToDelete}'. Ошибка удаления", "Ошибка",
+                                MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
         }
 
-        public void ShowDeleteButton(string recipeName)
+        public void ShowDeleteButton(int id)
         {
-            selectedRecipeToDelete = recipeName;
+            selectedRecipeToDelete = id;
             DeleteRecipeBtn.Visibility = Visibility.Visible;
         }
 
         public void HideDeleteButton()
         {
-            selectedRecipeToDelete = null;
+            selectedRecipeToDelete = 0;
             DeleteRecipeBtn.Visibility = Visibility.Collapsed;
         }
 
         // ========== ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ ==========
 
-        public ObservableCollection<IngredientItem> GetSelectedIngredients()
-        {
-            return selectedIngredients;
-        }
-
         public void ClearAllSelections()
         {
             selectedIngredients.Clear();
             UpdateDisplay();
+            UpdateRecipesContainer();
+        }
+
+        void UpdateRecipesContainer()
+        {
+            RecipesContainer.Items.Clear();
+            if(selectedIngredients.Count == 0 && constantIngredients.Count == 0)
+            {
+                RecipesContainer.Visibility = Visibility.Collapsed;
+                EmptyRecipesText.Visibility = Visibility.Visible;
+                return;
+            }
+            EmptyRecipesText.Visibility= Visibility.Collapsed;
+            RecipesContainer.Visibility= Visibility.Visible;
+            RecipeRepository recipeRepository = new RecipeRepository(dBContext);
+            var allRecipe = recipeRepository.GetAll();
+
+            bool hasAnyRecipe = false;
+
+            if (allRecipe.Count > 0)
+            {
+                foreach (var recipe in allRecipe)
+                {
+                    string recipeIngredients = recipe.Ingredient.Text.ToLower();
+
+                    bool hasAnySelectIngredient = selectedIngredients.Any(selected =>
+                        recipeIngredients.Contains(selected.Name.ToLower()));
+
+                    bool hasAnyConstantIngredient = constantIngredients.Any(selected =>
+                        recipeIngredients.Contains(selected.Name.ToLower()));
+
+                    if (hasAnyConstantIngredient || hasAnySelectIngredient)
+                    {
+                        var border = new Border
+                        {
+                            Background = Brushes.White,
+                            CornerRadius = new CornerRadius(8),
+                            Padding = new Thickness(15),
+                            Margin = new Thickness(0, 0, 0, 5),
+                            Tag = recipe.Id
+                        };
+
+                        var grid = new Grid();
+                        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(40) });
+                        grid.ColumnDefinitions.Add(new ColumnDefinition());
+                        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+                        // Иконка
+                        var icon = new TextBlock
+                        {
+                            Text = "🍽️",
+                            FontSize = 20,
+                            VerticalAlignment = VerticalAlignment.Center
+                        };
+                        Grid.SetColumn(icon, 0);
+                        grid.Children.Add(icon);
+
+                        // Название
+                        var title = new TextBlock
+                        {
+                            Text = recipe.Title,
+                            FontSize = 15,
+                            FontWeight = FontWeights.SemiBold,
+                            VerticalAlignment = VerticalAlignment.Center,
+                            Margin = new Thickness(10, 0, 0, 0)
+                        };
+                        Grid.SetColumn(title, 1);
+                        grid.Children.Add(title);
+
+                        // Время
+                        var time = new TextBlock
+                        {
+                            Text = $" ⏱️ {recipe.CookingTime} мин",
+                            FontSize = 12,
+                            Foreground = Brushes.Gray,
+                            VerticalAlignment = VerticalAlignment.Center
+                        };
+                        Grid.SetColumn(time, 2);
+                        grid.Children.Add(time);
+
+                        border.Child = grid;
+                        
+                        var item = new ListBoxItem
+                        {
+                            Content = border,
+                            Tag = recipe.Id,
+                            Cursor = System.Windows.Input.Cursors.Hand
+                        };
+
+                        RecipesContainer.Items.Add(item);
+                        hasAnyRecipe = true;
+                    }
+                } 
+            }
+            if (!hasAnyRecipe)
+            {
+                RecipesContainer.Visibility = Visibility.Collapsed;
+                EmptyRecipesText.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void ReceptsListBox_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            var selectedItem = RecipesContainer.SelectedItem as ListBoxItem;
+            if (selectedItem?.Tag != null)
+            {
+                if (int.TryParse(selectedItem.Tag.ToString(), out int recipeId))
+                {
+                    RecipeSelected?.Invoke(this, recipeId);
+                }
+            }
+        }
+
+        private void RecipesContainer_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // Если ничего не выбрано - скрываем кнопку удаления
+            if (RecipesContainer.SelectedItem == null)
+            {
+                HideDeleteButton();
+                return;
+            }
+
+            var selectedItem = RecipesContainer.SelectedItem;
+
+            // Определяем ID рецепта
+            int? recipeId = null;
+
+            if (selectedItem is ListBoxItem listBoxItem && listBoxItem.Tag != null)
+            {
+                if (int.TryParse(listBoxItem.Tag.ToString(), out int id))
+                    recipeId = id;
+            }
+            else if (selectedItem is Recipe recipe)
+            {
+                recipeId = recipe.Id;
+            }
+
+            // Показываем кнопку удаления, если есть ID
+            if (recipeId.HasValue)
+            {
+                ShowDeleteButton(recipeId.Value);
+            }
+            else
+            {
+                HideDeleteButton();
+            }
+        }
+
+        private void FridgeControl_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            var originalSource = e.OriginalSource as DependencyObject;
+            bool isClickOnListBox = IsElementInListBox(originalSource);
+
+            if (!isClickOnListBox)
+            {
+                RecipesContainer.SelectedItem = null;
+                HideDeleteButton();
+            }
+        }
+
+        private bool IsElementInListBox(DependencyObject element)
+        {
+            while (element != null)
+            {
+                if (element == RecipesContainer || element is ListBoxItem || element == DeleteRecipeBtn)
+                    return true;
+                element = VisualTreeHelper.GetParent(element);
+            }
+            return false;
         }
     }
 

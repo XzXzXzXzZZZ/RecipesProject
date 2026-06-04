@@ -403,19 +403,21 @@
                                    HorizontalAlignment="Center"/>
                     </Border>
 
-                    <StackPanel x:Name="RecipesContainer"
-                                Grid.Row="1"
-                                Margin="10"
-                                VerticalAlignment="Top">
-
+                    <StackPanel Grid.Row="1">
+                        <ListBox x:Name="RecipesContainer" Background="#FFF0F0F0"
+                                    Margin="10"
+                                    VerticalAlignment="Top" Visibility="Collapsed"
+                                 MouseDoubleClick="ReceptsListBox_MouseDoubleClick"
+                                 SelectionChanged="RecipesContainer_SelectionChanged"/>
                         <TextBlock x:Name="EmptyRecipesText"
-                                   Text="Выберите ингредиенты, чтобы увидеть подходящие рецепты..."
-                                   FontSize="14"
-                                   Foreground="Gray"
-                                   HorizontalAlignment="Center"
-                                   Margin="0,20,0,20"
-                                   Visibility="Visible"/>
+                                    Text="Выберите ингредиенты, чтобы увидеть подходящие рецепты..."
+                                    FontSize="14"
+                                    Foreground="Gray"
+                                    HorizontalAlignment="Center"
+                                    Margin="0,20,0,20"
+                                    Visibility="Visible"/>
                     </StackPanel>
+
                 </Grid>
             </Border>
 

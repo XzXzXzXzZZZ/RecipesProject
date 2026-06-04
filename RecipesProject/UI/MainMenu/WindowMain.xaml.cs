@@ -202,7 +202,9 @@ namespace RecipesProject.UI.MainMenu
         ///           ХОЛОДИЛЬНИК
         private void FridgeBTN_Click(object sender, RoutedEventArgs e)
         {
-            MainContentControl.Content = new Fridge.FridgeControl();
+            var fridgeControl = new Fridge.FridgeControl();
+            fridgeControl.RecipeSelected += AllReceptsControl_RecipeSelected;
+            MainContentControl.Content = fridgeControl;
             SearchBorder.Visibility = Visibility.Collapsed;
             ShowFridgeButtons();
         }

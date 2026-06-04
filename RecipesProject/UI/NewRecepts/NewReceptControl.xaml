@@ -42,30 +42,11 @@
             </StackPanel>
 
             <StackPanel Grid.Row="2" Margin="0,0,0,10">
-                <Grid Margin="0,0,0,10">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-
-                    <TextBlock Grid.Column="0" 
-                               Text="Ингредиенты:" 
-                               FontSize="14" 
-                               VerticalAlignment="Center"
-                               Margin="0,0,10,0"/>
-
-                    <!--Текстбокс для поиска -->
-                    <TextBox x:Name="SearchIngredientTextBox" 
-                             Grid.Column="1"
-                             Width="200"
-                             Height="30"
-                             Padding="5" 
-                             FontSize="12"
-                             VerticalAlignment="Center"
-                             GotFocus="SearchIngredientTextBox_GotFocus"
-                             LostFocus="SearchIngredientTextBox_LostFocus"/>
-                </Grid>
+                <TextBlock Grid.Column="0" 
+                           Text="Ингредиенты:" 
+                           FontSize="14" 
+                           VerticalAlignment="Center"
+                           Margin="0,0,10,10"/>
 
                 <!--текстбокс для ингредиентов -->
                 <TextBox x:Name="IngredientsTextBox" 

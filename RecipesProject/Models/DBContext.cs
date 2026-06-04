@@ -10,6 +10,10 @@ namespace RecipesProject.Models
 {
     public class DBContext:DbContext
     {
+        public DBContext() { }
+
+        public DBContext(DbContextOptions<DBContext> options) : base(options) { }
+
         public DbSet<Recipe> Recipes { get; set; } = null!;
         public DbSet<Step> Steps { get; set; } = null!;
         public DbSet<Ingredient> Ingredients { get; set; } = null!;
@@ -18,8 +22,10 @@ namespace RecipesProject.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            base.OnConfiguring(optionsBuilder);
-            optionsBuilder.UseSqlServer("Server=HOME-PC\\MSSQLSERVER01;Database=RecipesProject;Integrated Security=True;TrustServerCertificate=True");
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlServer("Server=HOME-PC\\MSSQLSERVER01;Database=RecipesProject;Integrated Security=True;TrustServerCertificate=True");
+            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

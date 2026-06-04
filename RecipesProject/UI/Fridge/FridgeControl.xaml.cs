@@ -488,82 +488,76 @@ namespace RecipesProject.UI.Fridge
             EmptyRecipesText.Visibility= Visibility.Collapsed;
             RecipesContainer.Visibility= Visibility.Visible;
             RecipeRepository recipeRepository = new RecipeRepository(dBContext);
-            var allRecipe = recipeRepository.GetAll();
+
+            List<string> ingredients = selectedIngredients.Select(i => i.Name).ToList();
+            ingredients.AddRange(constantIngredients.Select(i=>i.Name).ToList());
+
+            var result = recipeRepository.FindByIngredients(ingredients);
 
             bool hasAnyRecipe = false;
 
-            if (allRecipe.Count > 0)
+            if (result.Count > 0)
             {
-                foreach (var recipe in allRecipe)
+                foreach (var recipe in result)
                 {
-                    var recipeIngredients = recipe.Ingredients.Select(i=>i.Text.ToLower()).ToList();
-
-                    bool hasAnySelectIngredient = selectedIngredients.Any(selected =>
-                        recipeIngredients.Contains(selected.Name.ToLower()));
-
-                    bool hasAnyConstantIngredient = constantIngredients.Any(selected =>
-                        recipeIngredients.Contains(selected.Name.ToLower()));
-                    if (hasAnyConstantIngredient || hasAnySelectIngredient)
+                    var border = new Border
                     {
-                        var border = new Border
-                        {
-                            Background = Brushes.White,
-                            CornerRadius = new CornerRadius(8),
-                            Padding = new Thickness(15),
-                            Margin = new Thickness(0, 0, 0, 5),
-                            Tag = recipe.Id
-                        };
+                        Background = Brushes.White,
+                        CornerRadius = new CornerRadius(8),
+                        Padding = new Thickness(15),
+                        Margin = new Thickness(0, 0, 0, 5),
+                        Tag = recipe.Id
+                    };
 
-                        var grid = new Grid();
-                        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(40) });
-                        grid.ColumnDefinitions.Add(new ColumnDefinition());
-                        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+                    var grid = new Grid();
+                    grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(40) });
+                    grid.ColumnDefinitions.Add(new ColumnDefinition());
+                    grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
-                        // Иконка
-                        var icon = new TextBlock
-                        {
-                            Text = "🍽️",
-                            FontSize = 20,
-                            VerticalAlignment = VerticalAlignment.Center
-                        };
-                        Grid.SetColumn(icon, 0);
-                        grid.Children.Add(icon);
+                    // Иконка
+                    var icon = new TextBlock
+                    {
+                        Text = "🍽️",
+                        FontSize = 20,
+                        VerticalAlignment = VerticalAlignment.Center
+                    };
+                    Grid.SetColumn(icon, 0);
+                    grid.Children.Add(icon);
 
-                        // Название
-                        var title = new TextBlock
-                        {
-                            Text = recipe.Title,
-                            FontSize = 15,
-                            FontWeight = FontWeights.SemiBold,
-                            VerticalAlignment = VerticalAlignment.Center,
-                            Margin = new Thickness(10, 0, 0, 0)
-                        };
-                        Grid.SetColumn(title, 1);
-                        grid.Children.Add(title);
+                    // Название
+                    var title = new TextBlock
+                    {
+                        Text = recipe.Title,
+                        FontSize = 15,
+                        FontWeight = FontWeights.SemiBold,
+                        VerticalAlignment = VerticalAlignment.Center,
+                        Margin = new Thickness(10, 0, 0, 0)
+                    };
+                    Grid.SetColumn(title, 1);
+                    grid.Children.Add(title);
 
-                        // Время
-                        var time = new TextBlock
-                        {
-                            Text = $" ⏱️ {recipe.CookingTime} мин",
-                            FontSize = 12,
-                            Foreground = Brushes.Gray,
-                            VerticalAlignment = VerticalAlignment.Center
-                        };
-                        Grid.SetColumn(time, 2);
-                        grid.Children.Add(time);
+                    // Время
+                    var time = new TextBlock
+                    {
+                        Text = $" ⏱️ {recipe.CookingTime} мин",
+                        FontSize = 12,
+                        Foreground = Brushes.Gray,
+                        VerticalAlignment = VerticalAlignment.Center
+                    };
+                    Grid.SetColumn(time, 2);
+                    grid.Children.Add(time);
 
-                        border.Child = grid;
-                        
-                        var item = new ListBoxItem
-                        {
-                            Content = border,
-                            Tag = recipe.Id,
-                            Cursor = System.Windows.Input.Cursors.Hand
-                        };
+                    border.Child = grid;
 
-                        RecipesContainer.Items.Add(item);
-                        hasAnyRecipe = true;
-                    }
+                    var item = new ListBoxItem
+                    {
+                        Content = border,
+                        Tag = recipe.Id,
+                        Cursor = System.Windows.Input.Cursors.Hand
+                    };
+
+                    RecipesContainer.Items.Add(item);
+                    hasAnyRecipe = true;
                 } 
             }
             if (!hasAnyRecipe)

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RecipesProject.Models;
 using System.IO;
+using System.Windows;
 
 
 namespace RecipesProject.Data
@@ -164,6 +165,31 @@ namespace RecipesProject.Data
                 .Include(r => r.Steps)
                 .Include(r => r.Ingredients)
                 .ToList();
+        }
+
+
+        public List<Recipe> FindByIngredients(List<string> fridgeProducts)
+        {
+            var recipes = GetAll();
+            List<Recipe> result = new List<Recipe>();
+            if (recipes != null)
+            {
+                var fridgeLower = fridgeProducts.Select(p => p.ToLower()).ToList();
+
+                foreach (var recipe in recipes)
+                {
+                    foreach (var ingredient in recipe.Ingredients)
+                    {
+                        var ingredientLower = ingredient.Text.ToLower();
+                        if (fridgeLower.Any(fridgeProduct => ingredientLower.Contains(fridgeProduct)))
+                        {
+                            result.Add(recipe);
+                            break;
+                        }
+                    }
+                }
+            }
+            return result;
         }
 
         private void DeleteImage(string PhotoPath)

@@ -1,14 +1,15 @@
-﻿using System.Windows;
+﻿using System;
+using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using Microsoft.EntityFrameworkCore;
-using RecipesProject.UI.AllRecepts;  
-using RecipesProject.UI.FavRecepts;   
-using RecipesProject.UI.NewRecepts;
-using RecipesProject.Models;
 using RecipesProject.Data;
-
+using RecipesProject.Models;
+using RecipesProject.UI.AllRecepts;
+using RecipesProject.UI.FavRecepts;
+using RecipesProject.UI.NewRecepts;
+using Microsoft.EntityFrameworkCore;
 namespace RecipesProject.UI.MainMenu
 {
     public partial class WindowMain : Window
@@ -227,18 +228,16 @@ namespace RecipesProject.UI.MainMenu
         private void ClearSelectionBTN_Click(object sender, RoutedEventArgs e)
         {
             if (MainContentControl.Content is Fridge.FridgeControl fridgeControl)
-            {
                 fridgeControl.ClearAllSelections();
-            }
             SearchTextBox.Width = 500;
         }
 
+        // Поиск
         private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (MainContentControl?.Content is AllReceptsControl allReceptsControl)
             {
                 string searchText = SearchTextBox.Text;
-
                 if (string.IsNullOrWhiteSpace(searchText))
                 {
                     PlaceholderText.Visibility = Visibility.Visible;
@@ -251,10 +250,9 @@ namespace RecipesProject.UI.MainMenu
                 }
             }
 
-            if(MainContentControl?.Content is FavReceptsControl favReceptsControl)
+            if (MainContentControl?.Content is FavReceptsControl favReceptsControl)
             {
                 string searchText = SearchTextBox.Text;
-
                 if (string.IsNullOrWhiteSpace(searchText))
                 {
                     PlaceholderText.Visibility = Visibility.Visible;

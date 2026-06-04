@@ -363,8 +363,9 @@ namespace RecipesProject.UI.Fridge
                 panel.Children.Add(deleteBtn);
                 ingredient_const_Border.Child = panel;
                 ConstantProductsPanel.Children.Add(ingredient_const_Border);
-                UpdateRecipesContainer();
             }
+
+            UpdateRecipesContainer();
         }
 
         private void DeleteConstantProduct_Click(object sender, RoutedEventArgs e)
@@ -495,14 +496,13 @@ namespace RecipesProject.UI.Fridge
             {
                 foreach (var recipe in allRecipe)
                 {
-                    string recipeIngredients = recipe.Ingredient.Text.ToLower();
+                    var recipeIngredients = recipe.Ingredients.Select(i=>i.Text.ToLower()).ToList();
 
                     bool hasAnySelectIngredient = selectedIngredients.Any(selected =>
                         recipeIngredients.Contains(selected.Name.ToLower()));
 
                     bool hasAnyConstantIngredient = constantIngredients.Any(selected =>
                         recipeIngredients.Contains(selected.Name.ToLower()));
-
                     if (hasAnyConstantIngredient || hasAnySelectIngredient)
                     {
                         var border = new Border

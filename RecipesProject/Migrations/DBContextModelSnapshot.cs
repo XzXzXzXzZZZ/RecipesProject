@@ -38,8 +38,7 @@ namespace RecipesProject.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RecipeId")
-                        .IsUnique();
+                    b.HasIndex("RecipeId");
 
                     b.ToTable("Ingredients");
                 });
@@ -161,8 +160,8 @@ namespace RecipesProject.Migrations
             modelBuilder.Entity("RecipesProject.Models.Ingredient", b =>
                 {
                     b.HasOne("RecipesProject.Models.Recipe", "Recipe")
-                        .WithOne("Ingredient")
-                        .HasForeignKey("RecipesProject.Models.Ingredient", "RecipeId")
+                        .WithMany("Ingredients")
+                        .HasForeignKey("RecipeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -182,7 +181,7 @@ namespace RecipesProject.Migrations
 
             modelBuilder.Entity("RecipesProject.Models.Recipe", b =>
                 {
-                    b.Navigation("Ingredient");
+                    b.Navigation("Ingredients");
 
                     b.Navigation("Steps");
                 });

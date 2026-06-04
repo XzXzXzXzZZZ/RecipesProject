@@ -102,8 +102,7 @@ namespace RecipesProject.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Ingredients_RecipeId",
                 table: "Ingredients",
-                column: "RecipeId",
-                unique: true);
+                column: "RecipeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MyProducts_Name",

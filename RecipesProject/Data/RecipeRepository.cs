@@ -18,7 +18,7 @@ namespace RecipesProject.Data
         {
             return _context.Recipes
                 .Include(r => r.Steps)
-                .Include(r => r.Ingredient)
+                .Include(r => r.Ingredients)
                 .ToList();
         }
 
@@ -26,7 +26,7 @@ namespace RecipesProject.Data
         {
             return _context.Recipes
                 .Include(r => r.Steps)
-                .Include(r => r.Ingredient)
+                .Include(r => r.Ingredients)
                 .FirstOrDefault(r => r.Id == id);
         }
 
@@ -58,7 +58,7 @@ namespace RecipesProject.Data
         {
             var existing = _context.Recipes
                 .Include(r => r.Steps)
-                .Include(r => r.Ingredient)
+                .Include(r => r.Ingredients)
                 .FirstOrDefault(r => r.Id == updatedRecipe.Id);
 
             if (existing != null)
@@ -106,8 +106,8 @@ namespace RecipesProject.Data
                 _context.Steps.RemoveRange(existing.Steps);
                 existing.Steps = updatedRecipe.Steps;
 
-                _context.Ingredients.RemoveRange(existing.Ingredient);
-                existing.Ingredient = updatedRecipe.Ingredient;
+                _context.Ingredients.RemoveRange(existing.Ingredients);
+                existing.Ingredients = updatedRecipe.Ingredients;
 
                 _context.SaveChanges();
             }
@@ -150,7 +150,7 @@ namespace RecipesProject.Data
             return _context.Recipes
                 .Where(r => r.IsFavorite == 1)
                 .Include(r => r.Steps)
-                .Include(r => r.Ingredient)
+                .Include(r => r.Ingredients)
                 .ToList();
         }
 
@@ -162,7 +162,7 @@ namespace RecipesProject.Data
             return _context.Recipes
                 .Where(r => r.Title.Contains(query))
                 .Include(r => r.Steps)
-                .Include(r => r.Ingredient)
+                .Include(r => r.Ingredients)
                 .ToList();
         }
 

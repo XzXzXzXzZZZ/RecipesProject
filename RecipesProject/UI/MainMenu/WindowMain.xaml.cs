@@ -21,7 +21,9 @@ namespace RecipesProject.UI.MainMenu
                 using (DBContext dbContext = new DBContext())
                 {
                     dbContext.Database.Migrate();
-                    string[] defaultIngredients = new string[]
+                    if (!dbContext.MyProducts.Any())
+                    {
+                        string[] defaultIngredients = new string[]
                     {
                         "Огурцы",
                         "Помидоры",
@@ -53,11 +55,12 @@ namespace RecipesProject.UI.MainMenu
                         "Перцы",
                         "Авокадо"
                     };
-                    ProductRepository productRepository = new ProductRepository(dbContext);
-                    productRepository.SeedPermanentProducts();
-                    foreach (string productName in defaultIngredients)
-                    {
-                        productRepository.AddMyProduct(productName, false);
+                        ProductRepository productRepository = new ProductRepository(dbContext);
+                        productRepository.SeedPermanentProducts();
+                        foreach (string productName in defaultIngredients)
+                        {
+                            productRepository.AddMyProduct(productName, false);
+                        }
                     }
                 }
             }
